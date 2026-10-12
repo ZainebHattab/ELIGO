@@ -1,0 +1,4 @@
+Django~=5.1
+djangorestframework
+psycopg[binary]>=3.2
+pgvector
