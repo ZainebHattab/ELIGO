@@ -1,0 +1,7 @@
+:root { --eligo-primary: #1f4e8c; }
+.navbar-brand { font-weight: 700; letter-spacing: .5px; }
+.navbar .nav-link.active { font-weight: 600; }
+main { min-height: 70vh; }
+footer { font-size: .9rem; }
+.htmx-indicator { display: none; }
+.htmx-request .htmx-indicator, .htmx-request.htmx-indicator { display: inline-block; }
