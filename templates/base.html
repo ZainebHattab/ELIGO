@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -5,10 +6,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}ELIGO{% endblock %}</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{% static 'css/eligo.css' %}" rel="stylesheet">
 </head>
-<body>
-  <main class="container py-4">
+<body class="d-flex flex-column min-vh-100" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  {% include "partials/navbar.html" %}
+
+  <main class="container py-4 flex-grow-1">
+    {% include "partials/messages.html" %}
     {% block content %}{% endblock %}
   </main>
+
+  <footer class="border-top py-3 text-center text-muted">
+    ELIGO &middot; Student opportunities abroad
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js"></script>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

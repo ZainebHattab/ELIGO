@@ -1,14 +1,15 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>ELIGO</h1>
-{% if user.is_authenticated %}
-  <p>Logged in as {{ user.email }}</p>
-  <form method="post" action="{% url 'logout' %}">
-    {% csrf_token %}
-    <button class="btn btn-outline-secondary">Log out</button>
-  </form>
-{% else %}
-  <a class="btn btn-primary" href="{% url 'login' %}">Log in</a>
-  <a class="btn btn-outline-primary" href="{% url 'register' %}">Register</a>
-{% endif %}
+<div class="py-5 text-center">
+  <h1 class="display-5 fw-bold">Find the opportunity abroad that fits you</h1>
+  <p class="lead text-muted col-lg-7 mx-auto">
+    Build your profile, see which programs you are eligible for, and follow each application step by step.
+  </p>
+  {% if user.is_authenticated %}
+    <p class="text-muted">You are logged in as {{ user.email }}.</p>
+  {% else %}
+    <a class="btn btn-primary btn-lg me-2" href="{% url 'register' %}">Get started</a>
+    <a class="btn btn-outline-primary btn-lg" href="{% url 'login' %}">Log in</a>
+  {% endif %}
+</div>
 {% endblock %}
