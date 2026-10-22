@@ -1,0 +1,26 @@
+{% if field.field.widget.allow_multiple_selected %}
+  <fieldset class="mb-3">
+    <legend class="form-label fs-6 fw-normal mb-1">{{ field.label }}</legend>
+    {% for checkbox in field %}
+      <div class="form-check">
+        {{ checkbox.tag }}
+        <label class="form-check-label" for="{{ checkbox.id_for_label }}">{{ checkbox.choice_label }}</label>
+      </div>
+    {% endfor %}
+    {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+    {{ field.errors }}
+  </fieldset>
+{% elif field.widget_type == "checkbox" %}
+  <div class="form-check mb-3">
+    {{ field }}
+    <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field.errors }}
+  </div>
+{% else %}
+  <div class="mb-3">
+    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {{ field }}
+    {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+    {{ field.errors }}
+  </div>
+{% endif %}

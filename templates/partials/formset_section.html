@@ -1,0 +1,9 @@
+{{ formset.management_form }}
+{{ formset.non_form_errors }}
+<div id="{{ prefix }}-rows">
+  {% for form in formset %}{% include "partials/formset_row.html" %}{% endfor %}
+</div>
+<template id="{{ prefix }}-empty">
+  {% include "partials/formset_row.html" with form=formset.empty_form %}
+</template>
+<button type="button" class="btn btn-outline-primary btn-sm" data-add-row="{{ prefix }}">+ {{ add_label }}</button>

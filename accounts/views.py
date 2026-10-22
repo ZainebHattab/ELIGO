@@ -10,7 +10,7 @@ def register(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect("home")
+            return redirect("profile_edit")
     else:
         form = RegisterForm()
     return render(request, "accounts/form.html", {"form": form, "title": "Create your account", "button": "Register"})

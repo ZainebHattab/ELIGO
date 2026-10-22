@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -24,7 +25,7 @@ class Profile(models.Model):
     institution_country = models.CharField(max_length=10, choices=c.COUNTRY, default="TN")
     class_rank_percentile = models.DecimalField(
         "class rank (top X %)", max_digits=5, decimal_places=2, null=True, blank=True,
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        validators=[MinValueValidator(Decimal("0.01")), MaxValueValidator(100)],
     )
     field_of_study = models.CharField(max_length=30, choices=c.FIELD_OF_STUDY, null=True, blank=True)
     subfield = models.CharField(max_length=30, choices=c.SUBFIELD, null=True, blank=True)

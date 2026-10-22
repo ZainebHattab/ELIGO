@@ -5,3 +5,4 @@ main { min-height: 70vh; }
 footer { font-size: .9rem; }
 .htmx-indicator { display: none; }
 .htmx-request .htmx-indicator, .htmx-request.htmx-indicator { display: inline-block; }
+.errorlist { list-style: none; padding: 0; margin: .25rem 0 0; color: #dc3545; font-size: .875rem; }
