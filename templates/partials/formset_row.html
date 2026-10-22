@@ -1,0 +1,11 @@
+<div class="border rounded p-3 mb-3" data-row>
+  {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+  {% for field in form.visible_fields %}
+    {% if field.name != "DELETE" or form.instance.pk %}
+      {% include "partials/form_field.html" %}
+    {% endif %}
+  {% endfor %}
+  {% if not form.instance.pk %}
+    <button type="button" class="btn btn-link btn-sm text-danger p-0" data-remove-row>Remove</button>
+  {% endif %}
+</div>

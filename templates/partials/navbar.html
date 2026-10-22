@@ -12,7 +12,7 @@
           <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">Home</a>
         </li>
         {% if user.is_authenticated %}
-          <li class="nav-item"><a class="nav-link disabled" aria-disabled="true">Profile</a></li>
+          <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'profile_edit' %}active{% endif %}" href="{% url 'profile_edit' %}">Profile</a></li>
           <li class="nav-item"><a class="nav-link disabled" aria-disabled="true">Matches</a></li>
           <li class="nav-item"><a class="nav-link disabled" aria-disabled="true">Applications</a></li>
           <li class="nav-item"><a class="nav-link disabled" aria-disabled="true">Assistant</a></li>
