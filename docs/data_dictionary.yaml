@@ -1,0 +1,332 @@
+# ELIGO - Data dictionary v0.2 (DRAFT, to be signed by both poles = gate G1)
+# Single source of truth: Django forms/model choices AND the ai/ matching engine
+# read this file. If code and dictionary differ, the code is wrong.
+#
+# Changelog v0.1 -> v0.2 (after testing on Mitacs, DAAD, Eiffel, Erasmus Mundus, Chevening)
+#  1. enrollment_mode
+#  2. institution_type, institution_country
+#  3. class_rank_percentile
+#  4. previous_awards
+#  5. target_degree_level
+#  6. first_degree_date, highest_degree_date (+ computed years_since_* fields)
+#  7. computed highest_degree_at_start (removes the need for OR logic)
+#  8. work_experience_hours_post_degree
+#  9. field_of_study merged: computer science now sits inside engineering_technology; subfield added
+#
+# Conventions
+#  - Stored values are slugs; labels are for display only.
+#  - null = unknown -> the engine reports a "missing" criterion, never a failure.
+#  - matching: true  -> the engine may use the field in a criterion.
+#  - matching: false -> used only for ranking / CV / letter generation.
+#  - computed: true  -> derived by the engine, never entered by the student.
+#  - Criteria are combined with AND only (v0). Any "A or B" rule must be turned into a computed field.
+
+meta:
+  version: "0.2"
+  status: draft
+  owners: [Zaineb Hattab, Shaima Hechmi]
+  note: >
+    Dual nationality is not handled in v0. If a program excludes by citizenship,
+    nationality becomes a list (nationalities) with contains / not_contains.
+
+operators:
+  - eq
+  - neq
+  - in
+  - not_in
+  - gte
+  - lte
+  - between        # inclusive [min, max]
+  - contains       # list field contains a value
+  - not_contains
+
+scales:
+  degree_level:
+    secondary:         {rank: 0, label: "Secondary (baccalaureate level)"}
+    bachelor:          {rank: 1, label: "Bachelor (licence)"}
+    engineering_cycle: {rank: 2, label: "Engineering cycle (cycle ingenieur)"}
+    master:            {rank: 2, label: "Master"}
+    phd:               {rank: 3, label: "PhD"}
+  cefr:
+    A1: {rank: 1}
+    A2: {rank: 2}
+    B1: {rank: 3}
+    B2: {rank: 4}
+    C1: {rank: 5}
+    C2: {rank: 6}
+    native: {rank: 7}
+
+fields:
+  # ---------- Identity and origin ----------
+  date_of_birth:
+    type: date
+    matching: true
+    required: true
+
+  nationality:
+    type: choice
+    matching: true
+    required: true
+    default: TN
+    values: [TN]
+    form: hidden
+
+  country_of_residence:
+    type: choice
+    matching: true
+    required: true
+    default: TN
+    values: [TN, FR, DE, CA, IT, other]
+    form: visible
+
+  # ---------- Current studies ----------
+  current_level:
+    type: ranked_choice
+    scale: degree_level
+    allow_none: true
+    matching: true
+    required: true
+    help: "What the student is enrolled in now."
+
+  year_of_study:
+    type: integer
+    min: 1
+    max: 6
+    matching: true
+    required: false
+
+  expected_graduation:
+    type: date
+    matching: true
+    required: false
+
+  enrollment_mode:                       # change 1
+    type: choice
+    values: [full_time, part_time]
+    matching: true
+    required: true
+
+  institution_type:                      # change 2
+    type: choice
+    values: [public, private]
+    matching: true
+    required: true
+
+  institution_country:                   # change 2
+    type: choice                         # ISO 3166-1 alpha-2
+    default: TN
+    matching: true
+    required: true
+
+  class_rank_percentile:                 # change 3
+    type: decimal
+    min: 0
+    max: 100
+    matching: true
+    required: false
+    help: "Self-declared: 'top X%' of the class (20 = top 20%). Unverified, to be proven with a document."
+
+  field_of_study:                        # change 9
+    type: choice
+    matching: true
+    required: true
+    values:
+      - engineering_technology           # includes computer science, data, AI
+      - mathematics_statistics
+      - natural_sciences
+      - business_economics
+      - health_medicine
+      - law_social_sciences
+      - humanities_arts
+      - other
+    note: "List to be extended once the 15 programs are chosen."
+
+  subfield:                              # change 9
+    type: choice
+    matching: true
+    required: false
+    values:
+      - computer_science
+      - data_science_ai
+      - electrical_electronics
+      - mechanical_industrial
+      - civil_environmental
+      - other_engineering
+      - not_applicable
+    help: "Only for programs restricted to a sub-field."
+
+  specialization:
+    type: text
+    matching: false
+    required: false
+
+  # ---------- Degrees already obtained ----------
+  highest_degree:
+    type: ranked_choice
+    scale: degree_level
+    matching: true
+    required: true
+    help: "Highest degree already completed (e.g. licence while enrolled in the engineering cycle)."
+
+  first_degree_date:                     # change 6
+    type: date
+    matching: true
+    required: false
+    help: "Date the first (undergraduate) degree was completed. Null if not yet obtained."
+
+  highest_degree_date:                   # change 6
+    type: date
+    matching: true
+    required: false
+    help: "Date the highest completed degree was obtained."
+
+  # ---------- Marks ----------
+  gpa_value:
+    type: decimal
+    matching: false
+    required: false
+
+  gpa_scale:
+    type: choice
+    values: ["20", "4.0", "100"]
+    matching: false
+    required: false
+    note: "German 1-5 scale (1 = best) is NOT supported in v0."
+
+  gpa_percent:
+    type: decimal
+    computed: true
+    matching: true
+    formula: "gpa_value / gpa_scale * 100"
+    note: >
+      Linear conversion = v0 simplification. A 15/20 and a 3.0/4.0 are not
+      equivalent in practice: validate against the wording of each program.
+
+  # ---------- Experience ----------
+  work_experience_months:
+    type: integer
+    min: 0
+    matching: true
+    required: false
+
+  work_experience_hours_post_degree:     # change 8
+    type: integer
+    min: 0
+    matching: true
+    required: false
+    help: "Hours of work experience gained AFTER completing the first degree (Chevening counts 2,800 h)."
+
+  # ---------- Awards ----------
+  previous_awards:                       # change 4
+    type: list_of_choice
+    matching: true
+    required: false
+    values:                              # program slugs + generic buckets; grows with the catalogue
+      - mitacs_globalink
+      - daad_study_scholarship
+      - eiffel_master
+      - erasmus_mundus_jm
+      - chevening
+      - other_uk_government_scholarship
+      - french_government_scholarship
+    help: "Awards already received or currently held."
+
+  # ---------- Target ----------
+  target_degree_level:                   # change 5
+    type: choice
+    values: [master, phd, research_internship]
+    matching: true
+    required: true
+    note: >
+      Implicit filter: the engine only matches programs whose degree_level_offered
+      equals this value. It is not repeated as a criterion in every program.
+
+  # ---------- Languages ----------
+  languages:
+    type: list
+    item: LanguageSkill
+    matching: true
+    criterion_path: "language:<code>"
+
+# ---------- Computed fields (program-dependent), change 6 and 7 ----------
+computed:
+  age_at_deadline:
+    type: integer
+    formula: "full years between date_of_birth and program.deadline"
+  years_since_first_degree_at_deadline:
+    type: decimal
+    formula: "years between first_degree_date and program.deadline (0 if not yet obtained, null if unknown)"
+  years_since_highest_degree_at_deadline:
+    type: decimal
+    formula: "years between highest_degree_date and program.deadline (0 if not yet obtained, null if unknown)"
+  highest_degree_at_start:               # change 7
+    type: ranked_choice
+    scale: degree_level
+    formula: >
+      current_level if (expected_graduation <= program.start_date and
+      rank(current_level) > rank(highest_degree)) else highest_degree.
+      A final-year student therefore counts as holding the degree if they
+      graduate before the program starts.
+
+LanguageSkill:
+  language:
+    type: choice
+    values: [ar, fr, en, de, es, it, other]
+  cefr_level:
+    type: ranked_choice
+    scale: cefr
+  certificate_type:
+    type: choice
+    required: false
+    values: [ielts, toefl, toeic, delf, dalf, tcf, tef, goethe, testdaf, other]
+  certificate_score:
+    type: decimal
+    required: false
+    criterion_path: "language:<code>.certificate_score"
+  certificate_date:
+    type: date
+    required: false
+
+generation_only:
+  interests:
+    type: list_of_text
+    matching: false
+  target_countries:
+    type: list_of_choice
+    matching: false
+  target_opportunity_types:
+    type: list_of_choice
+    values: [scholarship, internship, fellowship]
+    matching: false
+  education_entries:
+    type: list
+    matching: false
+  consent_ai_processing:
+    type: boolean
+    required: true
+    matching: false
+
+# ---------- Program-side record (NOT part of the student profile) ----------
+# These are shown with the result; they are not eligibility criteria.
+program_record:
+  slug: text
+  name: text
+  operator: text
+  degree_level_offered: [master, phd, research_internship]
+  application_route: [direct, via_institution, via_home_university, via_consortium]
+  cohort: text
+  status: [open, closed, upcoming, unknown]
+  deadline: date          # per cohort; used by age_at_deadline and years_since_*
+  start_date: date        # used by highest_degree_at_start
+  source_url: url
+  date_checked: date
+  declarations: list_of_text        # e.g. return commitment
+  required_documents: list_of_text
+
+criterion_record:
+  field: "profile field, computed field or language:<code>"
+  operator: "one of operators"
+  value: "scalar, list or [min, max]"
+  mandatory: boolean
+  to_verify: boolean
+  source_note: text
