@@ -1,4 +1,4 @@
-# ELIGO - Data dictionary v0.2 (DRAFT, to be signed by both poles = gate G1)
+# ELIGO - Data dictionary v0.3 (DRAFT, to be signed by both poles = gate G1)
 # Single source of truth: Django forms/model choices AND the ai/ matching engine
 # read this file. If code and dictionary differ, the code is wrong.
 #
@@ -13,6 +13,27 @@
 #  8. work_experience_hours_post_degree
 #  9. field_of_study merged: computer science now sits inside engineering_technology; subfield added
 #
+# Changelog v0.2 -> v0.3 (after testing on DAAD, Campus France Eiffel, Stipendium Hungaricum, Mitacs GRI, IAESTE Tunisia)
+#  10. [BREAKING] nationality -> nationalities (list). Eiffel excludes French dual nationals, SH excludes Hungarian ones.
+#  11. months_resident_in_germany (DAAD: not more than 15 months at the deadline)
+#  12. phd_start_date + computed years_since_phd_start_at_deadline (DAAD doctoral: started at most 3 years ago)
+#  13. post_bac_years_completed (IAESTE Tunisia: 3 years of post-baccalaureate study)
+#  14. supervisor_status (DAAD doctoral, SH PhD, Eiffel PhD) and pfe_agreement (Mitacs GRI Tunisia)
+#  15. work_study_contract (Eiffel: apprenticeship / work-study status is incompatible)
+#  16. previous_awards: new values; new rejected_applications list (Eiffel: a rejected candidate cannot re-apply)
+#  17. field_of_study: architecture_design added (IAESTE: engineering or architecture)
+#  18. [BREAKING] target_degree_level and degree_level_offered: research_internship -> internship (GRI and IAESTE)
+#  19. LanguageSkill: computed certificate_age_years_at_deadline (DAAD: proof not older than 3 years)
+#  20. computed meets_iaeste_level (IAESTE level rule is "A or B", so it becomes a computed field)
+#  21. Two-level structure: funding_scheme_record added; program_record points to it (scheme_slug, track);
+#      criterion_record gets scope (scheme | program) and strength (hard | as_a_rule | soft) in place of
+#      mandatory [BREAKING for any code reading `mandatory`]; variants (e.g. Eiffel PhD 36 vs 12/18 months)
+#      are separate program records, so there is no applies_if.
+#  22. Not modelled, on purpose: availability windows and research-security affiliations (MITACS) become
+#      program declarations; the German 1-5 scale (Zuse Schools benchmark 1.7) stays unsupported, so that
+#      criterion is to_verify; SH exam threshold and IAESTE ranking score are not profile-based.
+#  Additive changes (new optional fields or enum values): 11, 12, 13, 14, 15, 16, 17, 19, 20.
+#
 # Conventions
 #  - Stored values are slugs; labels are for display only.
 #  - null = unknown -> the engine reports a "missing" criterion, never a failure.
@@ -22,12 +43,12 @@
 #  - Criteria are combined with AND only (v0). Any "A or B" rule must be turned into a computed field.
 
 meta:
-  version: "0.2"
+  version: "0.3"
   status: draft
   owners: [Zaineb Hattab, Shaima Hechmi]
   note: >
-    Dual nationality is not handled in v0. If a program excludes by citizenship,
-    nationality becomes a list (nationalities) with contains / not_contains.
+    Dual nationality is handled from v0.3 through the nationalities list
+    (contains / not_contains), as foreseen in v0.2.
 
 operators:
   - eq
@@ -39,6 +60,7 @@ operators:
   - between        # inclusive [min, max]
   - contains       # list field contains a value
   - not_contains
+  # gte / lte / between also apply to date fields (value = ISO date or [min, max] dates).
 
 scales:
   degree_level:
@@ -63,13 +85,14 @@ fields:
     matching: true
     required: true
 
-  nationality:
-    type: choice
+  nationalities:                         # change 10 (replaces `nationality`)
+    type: list_of_choice
     matching: true
     required: true
-    default: TN
-    values: [TN]
-    form: hidden
+    default: [TN]
+    values: [TN, FR, HU, other]
+    form: visible
+    help: "All nationalities held. Needed for programs that exclude French or Hungarian dual nationals."
 
   country_of_residence:
     type: choice
@@ -78,6 +101,13 @@ fields:
     default: TN
     values: [TN, FR, DE, CA, IT, other]
     form: visible
+
+  months_resident_in_germany:            # change 11
+    type: integer
+    min: 0
+    matching: true
+    required: false
+    help: "Months lived in Germany at the application date. 0 if never."
 
   # ---------- Current studies ----------
   current_level:
@@ -94,6 +124,14 @@ fields:
     max: 6
     matching: true
     required: false
+
+  post_bac_years_completed:              # change 13
+    type: integer
+    min: 0
+    max: 10
+    matching: true
+    required: false
+    help: "Years of post-baccalaureate study already completed (all programs, counting preparatory years)."
 
   expected_graduation:
     type: date
@@ -138,6 +176,7 @@ fields:
       - health_medicine
       - law_social_sciences
       - humanities_arts
+      - architecture_design              # change 17
       - other
     note: "List to be extended once the 15 programs are chosen."
 
@@ -179,6 +218,12 @@ fields:
     matching: true
     required: false
     help: "Date the highest completed degree was obtained."
+
+  phd_start_date:                        # change 12
+    type: date
+    matching: true
+    required: false
+    help: "Only if currently enrolled in a PhD: date the doctorate started."
 
   # ---------- Marks ----------
   gpa_value:
@@ -229,12 +274,46 @@ fields:
       - chevening
       - other_uk_government_scholarship
       - french_government_scholarship
+      - eiffel_phd                       # change 16
+      - daad_doctoral
+      - zuse_school_scholarship
+      - stipendium_hungaricum_bachelor
+      - stipendium_hungaricum_master
+      - stipendium_hungaricum_phd
+      - hungarian_government_scholarship
     help: "Awards already received or currently held."
+
+  rejected_applications:                 # change 16
+    type: list_of_choice
+    matching: true
+    required: false
+    values: [eiffel_master, eiffel_phd]
+    help: "Selections already lost. Eiffel does not accept a candidate rejected before, even via another institution."
+
+  # ---------- Application readiness ----------
+  work_study_contract:                   # change 15
+    type: boolean
+    matching: true
+    required: false
+    help: "Currently under an apprenticeship or work-study contract."
+
+  supervisor_status:                     # change 14
+    type: choice
+    values: [none, contacted, confirmed]
+    matching: true
+    required: false
+    help: "Doctoral applicants: none = no supervisor yet; confirmed = written confirmation or acceptance statement obtained."
+
+  pfe_agreement:                         # change 14
+    type: boolean
+    matching: true
+    required: false
+    help: "Signed agreement with the supervisor to carry out the end-of-studies project during the internship (Mitacs GRI Tunisia)."
 
   # ---------- Target ----------
   target_degree_level:                   # change 5
     type: choice
-    values: [master, phd, research_internship]
+    values: [master, phd, internship]    # change 18 (was research_internship)
     matching: true
     required: true
     note: >
@@ -259,6 +338,15 @@ computed:
   years_since_highest_degree_at_deadline:
     type: decimal
     formula: "years between highest_degree_date and program.deadline (0 if not yet obtained, null if unknown)"
+  years_since_phd_start_at_deadline:     # change 12
+    type: decimal
+    formula: "years between phd_start_date and program.deadline (null if not enrolled in a PhD or unknown)"
+  meets_iaeste_level:                    # change 20 - program-specific predicate (IAESTE Tunisia)
+    type: boolean
+    formula: >
+      (field_of_study in [engineering_technology, architecture_design] and post_bac_years_completed >= 3)
+      or (current_level in [master, phd] and field_of_study in
+      [engineering_technology, mathematics_statistics, natural_sciences])
   highest_degree_at_start:               # change 7
     type: ranked_choice
     scale: degree_level
@@ -286,6 +374,11 @@ LanguageSkill:
   certificate_date:
     type: date
     required: false
+  certificate_age_years_at_deadline:     # change 19
+    type: decimal
+    computed: true
+    formula: "years between certificate_date and program.deadline (null if no certificate date)"
+    criterion_path: "language:<code>.certificate_age_years_at_deadline"
 
 generation_only:
   interests:
@@ -312,8 +405,10 @@ program_record:
   slug: text
   name: text
   operator: text
-  degree_level_offered: [master, phd, research_internship]
-  application_route: [direct, via_institution, via_home_university, via_consortium]
+  scheme_slug: text                 # change 21: points to funding_scheme_record
+  track: [master, phd, internship]
+  degree_level_offered: [master, phd, internship]
+  application_route: [direct, via_institution, via_home_university, via_consortium, via_sending_partner, via_national_committee]
   cohort: text
   status: [open, closed, upcoming, unknown]
   deadline: date          # per cohort; used by age_at_deadline and years_since_*
@@ -323,10 +418,24 @@ program_record:
   declarations: list_of_text        # e.g. return commitment
   required_documents: list_of_text
 
+# ---------- Scheme-side record (change 21) ----------
+funding_scheme_record:
+  slug: text                        # e.g. daad, campus_france_eiffel, stipendium_hungaricum, mitacs_gri, iaeste_tunisia
+  name: text
+  operator: text
+  type: [scholarship, internship]
+  tracks: list_of_choice            # subset of [master, phd, internship]
+  source_url: url
+  date_checked: date
+
 criterion_record:
+  scope: [scheme, program]          # change 21: scheme criteria are inherited by every program of the scheme and track
+  scheme_slug: text
+  track: [master, phd, internship]
+  program_slug: "text, only when scope = program"
   field: "profile field, computed field or language:<code>"
   operator: "one of operators"
   value: "scalar, list or [min, max]"
-  mandatory: boolean
+  strength: [hard, as_a_rule, soft] # change 21 (replaces `mandatory`): hard fails -> not_eligible; as_a_rule fails -> partially_eligible with a reason; soft -> score only
   to_verify: boolean
   source_note: text
