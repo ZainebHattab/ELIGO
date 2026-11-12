@@ -1,4 +1,4 @@
-# ELIGO - Data dictionary v0.3 (DRAFT, to be signed by both poles = gate G1)
+# ELIGO - Data dictionary v0.6 (DRAFT, to be signed by both poles = gate G1)
 # Single source of truth: Django forms/model choices AND the ai/ matching engine
 # read this file. If code and dictionary differ, the code is wrong.
 #
@@ -34,6 +34,70 @@
 #      criterion is to_verify; SH exam threshold and IAESTE ranking score are not profile-based.
 #  Additive changes (new optional fields or enum values): 11, 12, 13, 14, 15, 16, 17, 19, 20.
 #
+# Changelog v0.3 -> v0.4 (after encoding the Criteria sheet and the Programs sheet against this file)
+#  23. current_level: "not enrolled" is stored as the slug none (rank -1 in degree_level); unknown = null.
+#  24. class_rank_percentile: min 0.01 (was 0), as in the code.
+#  25. Value lists added: institution_country, target_countries; country lists aligned (HU added to
+#      country_of_residence). nationalities keeps [TN, FR, HU, other] for now.
+#  26. [BREAKING] gpa_scale values are numbers [20, 4.0, 100] (were strings, so gpa_percent could not be computed).
+#  27. [BREAKING] field_of_study: humanities_arts split into humanities and arts_music_performing
+#      (DAAD excludes arts, music, performing arts and architecture, but not the humanities).
+#  28. New optional fields: master_started_in_germany (DAAD), hungarian_status_flags (SH),
+#      joint_supervision_agreement (Eiffel PhD 12/18 months, Paris-Saclay cotutelle topics).
+#  29. computed: currently_studying_in_france (Eiffel master, PhD 36 months, PhD priority rule) and
+#      is_enrolled_or_recent_graduate (IAESTE student_status "A or B").
+#  30. FIX computed years_since_phd_start_at_deadline: 0 when no PhD was started (was null, which made
+#      "1st year" Eiffel PhD and DAAD "started at most 3 years ago" unreachable for every new applicant).
+#  31. operator contains_any (DAAD country-of-origin list).
+#  32. program_record: country, opportunity_type [scholarship, internship] (needed by the program filters),
+#      institution, field_of_study, language_of_instruction, host_deadline added;
+#      deadline is now defined as the FUNDING application deadline.
+#  33. application_record added: status [preparing, submitted, result_received] (proposed, to agree).
+#  34. criterion_record conventions: (a) variant-specific Eiffel PhD criteria are scope: program on each
+#      variant record (E-P05, E-P10, E-P11 for 36 months; E-P12, E-P14, E-P16 for 12/18 months);
+#      (b) criteria on a property of the program itself use field: "program.<field>" and are checked when the
+#      catalogue is loaded, never against the student; (c) strength mapping from the Criteria sheet is documented.
+#  35. Still not modelled: SH no-show / unwithdrawn postponement history (S-M07); the Tübingen German-scale
+#      grade (stays to_verify: the university says it cannot compute the official grade before application).
+#  Additive changes in v0.4: 23, 24, 25, 28, 29, 31, 32, 33. Breaking: 26, 27 (30 corrects a formula).
+#
+# Changelog v0.4 -> v0.5 (rule for expired cycles: closed programs stay in the catalogue)
+#  36. program_record: next_expected_deadline (date, optional) and deadline_basis [confirmed, estimated].
+#  37. program_record.status is COMPUTED from deadline and today's date, never typed by hand
+#      (open: today <= deadline; closed: today > deadline; upcoming: call announced but not yet open; unknown: no deadline).
+#  38. Eligibility and cycle status are two separate labels. The ai/ contract evaluate_match() is UNCHANGED:
+#      the web app reads status from program_record and shows the expiry message only when the student is
+#      eligible or partially eligible. A closed program with no confirmed next call shows "No confirmed next call".
+#  Additive changes in v0.5: 36, 37, 38. Nothing breaking.
+#
+# Changelog v0.5 -> v0.6 (gaps found while rewriting the Criteria sheet; proposals, to review with Shaima)
+#  39. criterion_record.cycle (text, optional): the call cycle a criterion value comes from (e.g. eiffel_2027,
+#      sh_2026_27, mitacs_2027). The app shows one line next to the result: "Your eligibility is computed on this
+#      cycle's rules; it may change next year." Examples: Mitacs year_of_study eq 3, graduation windows, age cut-offs.
+#  40. program_record.opening_date (date, optional). "upcoming" cannot be computed from the deadline alone:
+#      upcoming = opening_date is set and today < opening_date.
+#  41. Status gate (refines change 37). A student must meet every applicable deadline, so the cycle closes at the
+#      EARLIEST of deadline and host_deadline when both are set (Eiffel: host internal deadlines come before the
+#      funding deadline). New optional program_record.deadline_rounds (list of dates) for programs with
+#      ALTERNATIVE rounds of the same intake (Saarland: 2026-11-15 and 2027-05-15): the gate is then the next round
+#      on or after today, and the cycle is closed only when no round is left.
+#  42. next_expected_deadline: an empty value on a closed cycle always shows "No confirmed next call" (covers both
+#      "not announced yet" and "will not return in this form", e.g. Paris-Saclay cotutelle-only PhD topics, Mitacs
+#      2027 cohort rules). deadline_basis estimated shows: "The next call is expected around Y, based on this year.
+#      Check the official page before preparing."
+#  43. deadline_basis describes the date the app shows: next_expected_deadline when the cycle is closed, but
+#      deadline (and opening_date) when the call for the current cycle is not published yet (SH 2027/28: opens
+#      mid-November, deadline 15 Jan, both estimated from 2026/27). The wording is the same: "expected around Y,
+#      based on this year. Check the official page before preparing."
+#  44. computed years_since_phd_start_at_start. Eiffel awards depend on the doctoral year the student enters at the
+#      start of the award (36 months: entering 1st year as a new arrival, so lte 0; 12 or 18 months: entering year
+#      1 to 3, so lte 2), not on the years elapsed at the deadline. E-P11 and E-P12 use this field instead of
+#      years_since_phd_start_at_deadline (approved by Zaineb and Shaima after reading the Eiffel regulations).
+#  45. Loader rule (no schema change, accepted by Shaima): a criterion whose field contains a template such as
+#      language:<program.language_of_instruction>.certificate_age_years_at_deadline (DAAD D-M07) is expanded at load
+#      time into one criterion per program, with <...> replaced by the program value. The engine never sees a template.
+#  Additive changes in v0.6: 39, 40, 41, 42, 43, 44, 45. Nothing breaking.
+#
 # Conventions
 #  - Stored values are slugs; labels are for display only.
 #  - null = unknown -> the engine reports a "missing" criterion, never a failure.
@@ -43,12 +107,12 @@
 #  - Criteria are combined with AND only (v0). Any "A or B" rule must be turned into a computed field.
 
 meta:
-  version: "0.3"
+  version: "0.6"
   status: draft
   owners: [Zaineb Hattab, Shaima Hechmi]
   note: >
-    Dual nationality is handled from v0.3 through the nationalities list
-    (contains / not_contains), as foreseen in v0.2.
+    Dual nationality is handled through the nationalities list (contains / not_contains).
+    v0.4 closed the open points of the Development pole (value lists, none, rank minimum, program filters); v0.5 adds the expired-cycle rule; v0.6 adds cycle, opening_date and deadline_rounds.
 
 operators:
   - eq
@@ -60,10 +124,12 @@ operators:
   - between        # inclusive [min, max]
   - contains       # list field contains a value
   - not_contains
+  - contains_any   # list field shares at least one value with the criterion list (change 31)
   # gte / lte / between also apply to date fields (value = ISO date or [min, max] dates).
 
 scales:
   degree_level:
+    none:              {rank: -1, label: "Not enrolled"}          # change 23 (current_level only)
     secondary:         {rank: 0, label: "Secondary (baccalaureate level)"}
     bachelor:          {rank: 1, label: "Bachelor (licence)"}
     engineering_cycle: {rank: 2, label: "Engineering cycle (cycle ingenieur)"}
@@ -99,7 +165,7 @@ fields:
     matching: true
     required: true
     default: TN
-    values: [TN, FR, DE, CA, IT, other]
+    values: [TN, FR, DE, HU, CA, IT, other]     # change 25 (HU added)
     form: visible
 
   months_resident_in_germany:            # change 11
@@ -109,14 +175,27 @@ fields:
     required: false
     help: "Months lived in Germany at the application date. 0 if never."
 
+  master_started_in_germany:             # change 28 (DAAD: a master already started in Germany is excluded)
+    type: boolean
+    matching: true
+    required: false
+    help: "A master's degree already started at a German university."
+
+  hungarian_status_flags:                # change 28 (SH: stateless, refugee, long-term resident are excluded)
+    type: list_of_choice
+    matching: true
+    required: false
+    values: [stateless, refugee, long_term_resident]
+    help: "Special status in Hungary. Empty list = none. Hungarian citizenship is read from nationalities."
+
   # ---------- Current studies ----------
   current_level:
     type: ranked_choice
     scale: degree_level
-    allow_none: true
+    allow_none: true                     # change 23: none = not enrolled, null = unknown
     matching: true
     required: true
-    help: "What the student is enrolled in now."
+    help: "What the student is enrolled in now. none = not enrolled; null = unknown."
 
   year_of_study:
     type: integer
@@ -150,21 +229,22 @@ fields:
     matching: true
     required: true
 
-  institution_country:                   # change 2
-    type: choice                         # ISO 3166-1 alpha-2
+  institution_country:                   # change 2, values added in change 25
+    type: choice
     default: TN
+    values: [TN, FR, DE, HU, CA, IT, other]
     matching: true
     required: true
 
-  class_rank_percentile:                 # change 3
+  class_rank_percentile:                 # change 3, min fixed in change 24
     type: decimal
-    min: 0
+    min: 0.01
     max: 100
     matching: true
     required: false
     help: "Self-declared: 'top X%' of the class (20 = top 20%). Unverified, to be proven with a document."
 
-  field_of_study:                        # change 9
+  field_of_study:                        # change 9, humanities split in change 27
     type: choice
     matching: true
     required: true
@@ -175,10 +255,11 @@ fields:
       - business_economics
       - health_medicine
       - law_social_sciences
-      - humanities_arts
+      - humanities
+      - arts_music_performing            # change 27
       - architecture_design              # change 17
       - other
-    note: "List to be extended once the 15 programs are chosen."
+    note: "List to be extended if one of the 5 core programs needs a value that is missing."
 
   subfield:                              # change 9
     type: choice
@@ -233,7 +314,7 @@ fields:
 
   gpa_scale:
     type: choice
-    values: ["20", "4.0", "100"]
+    values: [20, 4.0, 100]               # change 26 (numbers, not strings)
     matching: false
     required: false
     note: "German 1-5 scale (1 = best) is NOT supported in v0."
@@ -304,6 +385,12 @@ fields:
     required: false
     help: "Doctoral applicants: none = no supervisor yet; confirmed = written confirmation or acceptance statement obtained."
 
+  joint_supervision_agreement:           # change 28
+    type: boolean
+    matching: true
+    required: false
+    help: "Cotutelle agreement or co-supervision certificate signed or in progress (Eiffel PhD 12/18 months)."
+
   pfe_agreement:                         # change 14
     type: boolean
     matching: true
@@ -338,9 +425,27 @@ computed:
   years_since_highest_degree_at_deadline:
     type: decimal
     formula: "years between highest_degree_date and program.deadline (0 if not yet obtained, null if unknown)"
-  years_since_phd_start_at_deadline:     # change 12
+  years_since_phd_start_at_deadline:     # change 12, fixed in change 30
     type: decimal
-    formula: "years between phd_start_date and program.deadline (null if not enrolled in a PhD or unknown)"
+    formula: >
+      years between phd_start_date and program.deadline. 0 if no PhD was started
+      (current_level is not phd and phd_start_date is empty). null only if current_level = phd
+      and phd_start_date is unknown.
+  years_since_phd_start_at_start:        # change 44 (Eiffel PhD)
+    type: decimal
+    formula: >
+      years between phd_start_date and program.start_date (negative if the PhD starts after the program
+      start). 0 if no PhD was started (current_level is not phd and phd_start_date is empty). null only if
+      current_level = phd and phd_start_date is unknown. Eiffel counts the doctoral year the student ENTERS
+      at the start of the award (1 Sept of the award year), not at the application deadline.
+  currently_studying_in_france:          # change 29 (Eiffel)
+    type: boolean
+    formula: "current_level != none and institution_country = FR"
+  is_enrolled_or_recent_graduate:        # change 29 (IAESTE student_status: enrolled OR graduated within one year)
+    type: boolean
+    formula: >
+      current_level != none or years_since_highest_degree_at_deadline <= 1
+      (null if current_level = none and the degree date is unknown)
   meets_iaeste_level:                    # change 20 - program-specific predicate (IAESTE Tunisia)
     type: boolean
     formula: >
@@ -386,6 +491,7 @@ generation_only:
     matching: false
   target_countries:
     type: list_of_choice
+    values: [DE, FR, HU, CA, IT, other]  # change 25
     matching: false
   target_opportunity_types:
     type: list_of_choice
@@ -405,13 +511,23 @@ program_record:
   slug: text
   name: text
   operator: text
+  institution: text                 # change 32: host institution (e.g. a university)
+  country: [TN, FR, DE, HU, CA, IT, other]   # change 32: host country, used by the program filters
+  opportunity_type: [scholarship, internship] # change 32: used by the program filters; same values as funding_scheme_record.type
   scheme_slug: text                 # change 21: points to funding_scheme_record
   track: [master, phd, internship]
   degree_level_offered: [master, phd, internship]
+  field_of_study: text              # change 32: same slugs as the student field_of_study; read by "program.field_of_study" criteria
+  language_of_instruction: [ar, fr, en, de, hu, other]   # change 32
   application_route: [direct, via_institution, via_home_university, via_consortium, via_sending_partner, via_national_committee]
   cohort: text
-  status: [open, closed, upcoming, unknown]
-  deadline: date          # per cohort; used by age_at_deadline and years_since_*
+  status: [open, closed, upcoming, unknown]   # changes 37, 40, 41: computed from opening_date, deadline, host_deadline, deadline_rounds and today's date, never entered by hand
+  deadline: date          # FUNDING application deadline (scheme side); used by age_at_deadline and years_since_*
+  host_deadline: date     # change 32: host or internal deadline, display only (e.g. Eiffel host internal deadline, university deadline)
+  opening_date: date      # change 40: optional; needed for status upcoming
+  deadline_rounds: list_of_date   # change 41: optional; alternative rounds of the same intake (e.g. Saarland early and late)
+  next_expected_deadline: date   # change 36: optional; for a closed cycle, the expected deadline of the next call (empty = "No confirmed next call", change 42)
+  deadline_basis: [confirmed, estimated]   # changes 36, 43: basis of the date shown (deadline or next_expected_deadline) ; confirmed = published by the operator; estimated = same date as this year
   start_date: date        # used by highest_degree_at_start
   source_url: url
   date_checked: date
@@ -433,9 +549,20 @@ criterion_record:
   scheme_slug: text
   track: [master, phd, internship]
   program_slug: "text, only when scope = program"
-  field: "profile field, computed field or language:<code>"
+  field: "profile field, computed field, language:<code>, or program.<field> (change 34b)"
   operator: "one of operators"
   value: "scalar, list or [min, max]"
   strength: [hard, as_a_rule, soft] # change 21 (replaces `mandatory`): hard fails -> not_eligible; as_a_rule fails -> partially_eligible with a reason; soft -> score only
+  cycle: text                       # change 39: optional; call cycle the value comes from, e.g. eiffel_2027
   to_verify: boolean
   source_note: text
+  # Mapping from the Criteria sheet "strength" column (change 34c):
+  #   hard -> hard | as_a_rule -> as_a_rule | hard_unless_confirmed -> as_a_rule | soft -> soft
+  #   conditional_hard -> program declaration, not a criterion
+  #   program_defined / offer_defined / constraint / informational -> not stored as criteria
+  # Mapping from the Criteria sheet "level" column: scheme -> scope scheme; program -> scope program.
+  # Mapping from the Criteria sheet "applies_if" column: a variant becomes its own program record (change 34a).
+
+# ---------- Application record (change 33, proposed, to agree with the Development pole) ----------
+application_record:
+  status: [preparing, submitted, result_received]
