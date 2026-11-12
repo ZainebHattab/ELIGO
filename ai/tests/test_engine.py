@@ -5,7 +5,7 @@ import pytest
 from ai.matching.criteria_io import load_criteria_csv
 from ai.matching.criterion import Outcome
 from ai.matching.engine import Status, applies_to_program, combine_statuses, evaluate_program, select_criteria
-from ai.matching.test_criterion import COMPLETE_PROFILE, CSV_PATH
+from ai.tests.helpers import COMPLETE_PROFILE, CSV_PATH
 
 E, P, N = Status.ELIGIBLE, Status.PARTIALLY_ELIGIBLE, Status.NOT_ELIGIBLE
 

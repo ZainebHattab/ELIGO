@@ -6,7 +6,7 @@ import pytest
 from ai.matching.criteria_io import load_criteria_csv
 from ai.matching.engine import select_criteria
 from ai.matching.match import evaluate_match
-from ai.matching.test_criterion import COMPLETE_PROFILE, CSV_PATH
+from ai.tests.helpers import COMPLETE_PROFILE, CSV_PATH
 
 STATUSES = {"eligible", "partially_eligible", "not_eligible"}
 SOURCES = {"scheme", "program"}

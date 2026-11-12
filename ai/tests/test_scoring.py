@@ -6,7 +6,7 @@ from ai.matching.criteria_io import load_criteria_csv
 from ai.matching.criterion import CriterionResult, Impact, Outcome
 from ai.matching.engine import Status, evaluate_program
 from ai.matching.scoring import BANDS, compute_score, ratio
-from ai.matching.test_criterion import COMPLETE_PROFILE, CSV_PATH
+from ai.tests.helpers import COMPLETE_PROFILE, CSV_PATH
 
 E, P, N = Status.ELIGIBLE, Status.PARTIALLY_ELIGIBLE, Status.NOT_ELIGIBLE
 

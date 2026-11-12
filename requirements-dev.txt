@@ -1,4 +1,13 @@
 -r requirements.txt
-pytest
+pytest>=8.0
 pytest-django
 ruff
+# Notebooks (CRISP-DM pages, data exploration)
+jupyter>=1.0
+pandas>=2.0
+
+# Sprint 3 (RAG): uncomment once the embedding model, LLM and vector store are chosen
+# psycopg[binary]>=3.1
+# pgvector>=0.3
+# sentence-transformers>=3.0
+# pypdf>=4.0
