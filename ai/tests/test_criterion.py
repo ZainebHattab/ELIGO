@@ -5,6 +5,7 @@ import pytest
 
 from ai.matching.criterion import Impact, Outcome, evaluate_criterion, impact_of
 from ai.matching.criteria_io import load_criteria_csv
+from ai.tests.helpers import COMPLETE_PROFILE, CSV_PATH
 
 PROGRAM = {"deadline": date(2027, 1, 6), "start_date": date(2027, 9, 1)}
 NO_DEADLINE = {"deadline": None, "start_date": date(2027, 10, 1)}
