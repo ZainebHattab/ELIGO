@@ -1,0 +1,394 @@
+base_profiles:
+
+  master_tn:   # 3rd-year engineering student, final year, Tunisia (D01, D02, E01, S01)
+    date_of_birth: 2000-01-01
+    nationalities: [TN]
+    country_of_residence: TN
+    current_level: engineering_cycle
+    year_of_study: 3
+    expected_graduation: 2027-06-30
+    enrollment_mode: full_time
+    institution_type: public
+    institution_country: TN
+    class_rank_percentile: 10
+    field_of_study: engineering_technology
+    highest_degree: bachelor
+    first_degree_date: 2022-07-01
+    highest_degree_date: 2022-07-01
+    gpa_value: 15
+    gpa_scale: 20
+    post_bac_years_completed: 3
+    months_resident_in_germany: 0
+    master_started_in_germany: false
+    hungarian_status_flags: []
+    previous_awards: []
+    rejected_applications: []
+    work_study_contract: false
+    joint_supervision_agreement: false
+    pfe_agreement: true
+    supervisor_status: confirmed
+    target_degree_level: master
+    languages:
+      - {language: en, cefr_level: C1}     # D02 needs C1, E01 needs B2
+
+  phd_tn:      # engineer who already holds a master, not enrolled now (S07)
+    date_of_birth: 1999-03-10
+    nationalities: [TN]
+    country_of_residence: TN
+    current_level: none
+    enrollment_mode: full_time
+    institution_type: public
+    institution_country: TN
+    field_of_study: engineering_technology
+    highest_degree: master
+    first_degree_date: 2021-07-01
+    highest_degree_date: 2025-07-01
+    gpa_value: 15
+    gpa_scale: 20
+    months_resident_in_germany: 0
+    master_started_in_germany: false
+    hungarian_status_flags: []
+    previous_awards: []
+    rejected_applications: []
+    work_study_contract: false
+    supervisor_status: confirmed
+    target_degree_level: phd
+    languages:
+      - {language: en, cefr_level: C1}
+cases:
+# ----- Eiffel (E01) -----
+  - id: E01-01
+    description: Perfect profile, no change
+    program: prg-e01
+    base: master_tn
+    set: {}
+    expect: {status: eligible, reasons_from: [], failing: [], missing: []}
+
+  - id: E01-02
+    description: Born 1996-12-31, one day too early (E-M02 needs 1997-04-01 or later)
+    program: prg-e01
+    base: master_tn
+    set: {date_of_birth: 1996-12-31}
+    expect: {status: not_eligible, reasons_from: [scheme], failing: [E-M02], missing: []}
+
+  - id: E01-03
+    description: Threshold, born exactly 1997-04-01. gte is inclusive, so it passes
+    program: prg-e01
+    base: master_tn
+    set: {date_of_birth: 1997-04-01}
+    expect: {status: eligible, reasons_from: [], failing: [], missing: []}
+
+  - id: E01-04
+    description: French dual national. Passes the program English rule, fails the scheme (E-M01)
+    program: prg-e01
+    base: master_tn
+    set: {nationalities: [TN, FR]}
+    expect: {status: not_eligible, reasons_from: [scheme], failing: [E-M01], missing: []}
+
+  - id: E01-05
+    description: Under a work-study contract (E-M09)
+    program: prg-e01
+    base: master_tn
+    set: {work_study_contract: true}
+    expect: {status: not_eligible, reasons_from: [scheme], failing: [E-M09], missing: []}
+
+  - id: E01-06
+    description: Already rejected for an Eiffel master (E-M06)
+    program: prg-e01
+    base: master_tn
+    set: {rejected_applications: [eiffel_master]}
+    expect: {status: not_eligible, reasons_from: [scheme], failing: [E-M06], missing: []}
+
+  - id: E01-07
+    description: Studies in France now (E-M03, computed currently_studying_in_france)
+    program: prg-e01
+    base: master_tn
+    set: {institution_country: FR}
+    expect: {status: not_eligible, reasons_from: [scheme], failing: [E-M03], missing: []}
+
+  - id: E01-08
+    description: Holds another French government scholarship. as_a_rule, so only a warning (E-M07)
+    program: prg-e01
+    base: master_tn
+    set: {previous_awards: [french_government_scholarship]}
+    expect: {status: partially_eligible, reasons_from: [scheme], failing: [E-M07], missing: []}
+
+  - id: E01-09
+    description: Work-study question left empty. Hard rule, so missing and not failed (E-M09)
+    program: prg-e01
+    base: master_tn
+    set: {work_study_contract: null}
+    expect: {status: partially_eligible, reasons_from: [], failing: [], missing: ["scheme:work_study_contract"]}
+
+  - id: E01-10
+    description: English B1. Passes the scheme, fails the program rule (B2 needed)
+    program: prg-e01
+    base: master_tn
+    set: {languages: [{language: en, cefr_level: B1}]}
+    expect: {status: not_eligible, reasons_from: [program], failing: [PRG-E01-EN], missing: []}
+
+  - id: E01-11
+    description: No language listed. The program rule is hard, so missing
+    program: prg-e01
+    base: master_tn
+    set: {languages: []}
+    expect: {status: partially_eligible, reasons_from: [], failing: [], missing: ["program:language:en"]}
+
+  - id: E01-12
+    description: Target level is phd, but the program offers master (hidden TARGET-LEVEL)
+    program: prg-e01
+    base: master_tn
+    set: {target_degree_level: phd}
+    expect: {status: not_eligible, reasons_from: [program], failing: null, missing: []}
+    # ----- DAAD scheme cases (run on D01: it has no program rule) -----
+  - id: D01-01
+    description: Perfect profile, real data. Deadline unknown, so D-M02 is missing, never failed
+    program: prg-d01
+    base: master_tn
+    set: {}
+    expect: {status: partially_eligible, reasons_from: [], failing: [], missing: ["scheme:years_since_highest_degree_at_deadline"]}
+
+  - id: D01-02
+    description: What-if, same profile with a deadline. D-M02 passes (degree 2022, about 4.4 years)
+    program: prg-d01
+    base: master_tn
+    set: {}
+    program_set: {deadline: 2026-11-15}
+    expect: {status: eligible, reasons_from: [], failing: [], missing: []}
+    to_verify: true
+
+  - id: D01-03
+    description: 16 months lived in Germany (D-M03 allows 15 at most)
+    program: prg-d01
+    base: master_tn
+    set: {months_resident_in_germany: 16}
+    expect: {status: not_eligible, reasons_from: [scheme], failing: [D-M03], missing: ["scheme:years_since_highest_degree_at_deadline"]}
+
+  - id: D01-04
+    description: Threshold, exactly 15 months. lte is inclusive. What-if deadline so the result is clean
+    program: prg-d01
+    base: master_tn
+    set: {months_resident_in_germany: 15}
+    program_set: {deadline: 2026-11-15}
+    expect: {status: eligible, reasons_from: [], failing: [], missing: []}
+    to_verify: true
+
+  - id: D01-05
+    description: Already started a master in Germany (D-M04)
+    program: prg-d01
+    base: master_tn
+    set: {master_started_in_germany: true}
+    expect: {status: not_eligible, reasons_from: [scheme], failing: [D-M04], missing: ["scheme:years_since_highest_degree_at_deadline"]}
+
+  - id: D01-06
+    description: Field is arts, music or performing arts (D-M06 excludes it)
+    program: prg-d01
+    base: master_tn
+    set: {field_of_study: arts_music_performing}
+    expect: {status: not_eligible, reasons_from: [scheme], failing: [D-M06], missing: ["scheme:years_since_highest_degree_at_deadline"]}
+
+  - id: D01-07
+    description: Nationality is "other", not Tunisian (D-M05)
+    program: prg-d01
+    base: master_tn
+    set: {nationalities: [other]}
+    expect: {status: not_eligible, reasons_from: [scheme], failing: [D-M05], missing: ["scheme:years_since_highest_degree_at_deadline"]}
+
+  - id: D01-08
+    description: What-if deadline, degree from 2019 (about 7.4 years, over 6). as_a_rule, so a warning only
+    program: prg-d01
+    base: master_tn
+    set: {first_degree_date: 2019-07-01, highest_degree_date: 2019-07-01}
+    program_set: {deadline: 2026-11-15}
+    expect: {status: partially_eligible, reasons_from: [scheme], failing: [D-M02], missing: []}
+    to_verify: true
+
+  - id: D01-09
+    description: Months in Germany left empty. Hard rule, so missing, not failed (D-M03)
+    program: prg-d01
+    base: master_tn
+    set: {months_resident_in_germany: null}
+    expect: {status: partially_eligible, reasons_from: [], failing: [], missing: ["scheme:months_resident_in_germany", "scheme:years_since_highest_degree_at_deadline"]}
+
+  - id: D01-10
+    description: Degree date left empty while the deadline is known (D-M02 missing because of the student)
+    program: prg-d01
+    base: master_tn
+    set: {highest_degree_date: null}
+    program_set: {deadline: 2026-11-15}
+    expect: {status: partially_eligible, reasons_from: [], failing: [], missing: ["scheme:years_since_highest_degree_at_deadline"]}
+    to_verify: true
+
+# ----- D02 specific (Saarland: English C1 hard, field as_a_rule) -----
+  - id: D02-01
+    description: Perfect profile, real data
+    program: prg-d02
+    base: master_tn
+    set: {}
+    expect: {status: partially_eligible, reasons_from: [], failing: [], missing: ["scheme:years_since_highest_degree_at_deadline"]}
+
+  - id: D02-02
+    description: English B2. Passes the scheme, fails the program rule (C1 needed)
+    program: prg-d02
+    base: master_tn
+    set: {languages: [{language: en, cefr_level: B2}]}
+    expect: {status: not_eligible, reasons_from: [program], failing: [PRG-D02-EN], missing: ["scheme:years_since_highest_degree_at_deadline"]}
+
+  - id: D02-03
+    description: Business and economics. Program field rule is as_a_rule, scheme D-M06 passes
+    program: prg-d02
+    base: master_tn
+    set: {field_of_study: business_economics}
+    expect: {status: partially_eligible, reasons_from: [program], failing: [PRG-D02-FIELD], missing: ["scheme:years_since_highest_degree_at_deadline"]}
+
+  - id: D02-04
+    description: Arts field. Fails the scheme (hard) and the program field rule together
+    program: prg-d02
+    base: master_tn
+    set: {field_of_study: arts_music_performing}
+    expect: {status: not_eligible, reasons_from: [scheme, program], failing: [D-M06, PRG-D02-FIELD], missing: ["scheme:years_since_highest_degree_at_deadline"]}
+
+  - id: D02-05
+    description: Target level is phd, but the program offers master
+    program: prg-d02
+    base: master_tn
+    set: {target_degree_level: phd}
+    expect: {status: not_eligible, reasons_from: [program], failing: null, missing: ["scheme:years_since_highest_degree_at_deadline"]} 
+# ----- SH master (S01: scheme rules shared with any SH master program) -----
+  - id: S01-01
+    description: Perfect profile
+    program: prg-s01
+    base: master_tn
+    set: {}
+    expect: {status: eligible, reasons_from: [], failing: [], missing: []}
+
+  - id: S01-02
+    description: Hungarian dual national. Fails the scheme (S-M02a), passes the program field rule
+    program: prg-s01
+    base: master_tn
+    set: {nationalities: [TN, HU]}
+    expect: {status: not_eligible, reasons_from: [scheme], failing: [S-M02a], missing: []}
+
+  - id: S01-03
+    description: Long-term resident in Hungary (S-M02d)
+    program: prg-s01
+    base: master_tn
+    set: {hungarian_status_flags: [long_term_resident]}
+    expect: {status: not_eligible, reasons_from: [scheme], failing: [S-M02d], missing: []}
+
+  - id: S01-04
+    description: Already held an SH master scholarship (S-M07a)
+    program: prg-s01
+    base: master_tn
+    set: {previous_awards: [stipendium_hungaricum_master]}
+    expect: {status: not_eligible, reasons_from: [scheme], failing: [S-M07a], missing: []}
+
+  - id: S01-05
+    description: Held an SH bachelor scholarship. Moving up a level is allowed, so it passes
+    program: prg-s01
+    base: master_tn
+    set: {previous_awards: [stipendium_hungaricum_bachelor]}
+    expect: {status: eligible, reasons_from: [], failing: [], missing: []}
+
+  - id: S01-06
+    description: Threshold, born exactly 2008-08-31. lte is inclusive. Unrealistic age, engine boundary only
+    program: prg-s01
+    base: master_tn
+    set: {date_of_birth: 2008-08-31}
+    expect: {status: eligible, reasons_from: [], failing: [], missing: []}
+    to_verify: true      # S-M03 is to_verify (2026/27 value)
+
+  - id: S01-07
+    description: Date of birth left empty. Hard rule, so missing, not failed (S-M03)
+    program: prg-s01
+    base: master_tn
+    set: {date_of_birth: null}
+    expect: {status: partially_eligible, reasons_from: [], failing: [], missing: ["scheme:date_of_birth"]}
+    to_verify: true
+
+  - id: S01-08
+    description: Business and economics. Passes the scheme (S-M09), fails the program field rule (as_a_rule). The soft S-M10 fails too
+    program: prg-s01
+    base: master_tn
+    set: {field_of_study: business_economics}
+    expect: {status: partially_eligible, reasons_from: [scheme, program], failing: [S-M10, PRG-S01-FIELD], missing: []}
+    to_verify: true      # PRG-S01-FIELD is to_verify
+
+  - id: S01-09
+    description: Field of study left empty. S-M09 and the program rule are missing. The soft S-M10 is not asked
+    program: prg-s01
+    base: master_tn
+    set: {field_of_study: null}
+    expect: {status: partially_eligible, reasons_from: [], failing: [], missing: ["scheme:field_of_study", "program:field_of_study"]}
+    to_verify: true
+
+  - id: S01-10
+    description: Target level is phd, but the program offers master
+    program: prg-s01
+    base: master_tn
+    set: {target_degree_level: phd}
+    expect: {status: not_eligible, reasons_from: [program], failing: null, missing: []}
+# ----- SH PhD (S07: scheme rules S-P01..S-P07, program rule S-P10) -----
+  - id: S07-01
+    description: Perfect profile. Not enrolled, holds a master (S-P03 passes without needing a date)
+    program: prg-s07
+    base: phd_tn
+    set: {}
+    expect: {status: eligible, reasons_from: [], failing: [], missing: []}
+
+  - id: S07-02
+    description: Hungarian dual national. Fails the scheme (S-P02a), passes the program rule
+    program: prg-s07
+    base: phd_tn
+    set: {nationalities: [TN, HU]}
+    expect: {status: not_eligible, reasons_from: [scheme], failing: [S-P02a], missing: []}
+
+  - id: S07-03
+    description: Highest degree is a bachelor, no master (S-P03 needs master)
+    program: prg-s07
+    base: phd_tn
+    set: {highest_degree: bachelor}
+    expect: {status: not_eligible, reasons_from: [scheme], failing: [S-P03], missing: []}
+
+  - id: S07-04
+    description: Threshold. Final-year engineer graduating 2027-06-30, before the start. engineering_cycle has the same rank as master, so S-P03 passes
+    program: prg-s07
+    base: phd_tn
+    set: {current_level: engineering_cycle, highest_degree: bachelor, expected_graduation: 2027-06-30}
+    expect: {status: eligible, reasons_from: [], failing: [], missing: []}
+    to_verify: true      # relies on engineering_cycle = master rank (dictionary scale)
+
+  - id: S07-05
+    description: Already received an SH PhD scholarship (S-P06)
+    program: prg-s07
+    base: phd_tn
+    set: {previous_awards: [stipendium_hungaricum_phd]}
+    expect: {status: not_eligible, reasons_from: [scheme], failing: [S-P06], missing: []}
+
+  - id: S07-06
+    description: No supervisor yet. Passes the scheme, fails the program rule (S-P10)
+    program: prg-s07
+    base: phd_tn
+    set: {supervisor_status: none}
+    expect: {status: not_eligible, reasons_from: [program], failing: [S-P10, S-P11], missing: []}
+
+  - id: S07-07
+    description: Supervisor question left empty. Hard rule, so missing, not failed (S-P10)
+    program: prg-s07
+    base: phd_tn
+    set: {supervisor_status: null}
+    expect: {status: partially_eligible, reasons_from: [], failing: [], missing: ["program:supervisor_status"]}
+
+  - id: S07-08
+    description: Supervisor only contacted, not confirmed. S-P10 passes, S-P11 (confirmed, as_a_rule) fails
+    program: prg-s07
+    base: phd_tn
+    set: {supervisor_status: contacted}
+    expect: {status: partially_eligible, reasons_from: [program], failing: [S-P11], missing: []}
+
+  - id: S07-09
+    description: Target level is master, but the program offers phd
+    program: prg-s07
+    base: phd_tn
+    set: {target_degree_level: master}
+    expect: {status: not_eligible, reasons_from: [program], failing: null, missing: []}    
