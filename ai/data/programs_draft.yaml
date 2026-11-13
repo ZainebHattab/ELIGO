@@ -1,0 +1,211 @@
+# ELIGO - Core 5 programs: DRAFT records + program-level criteria
+# Format: dictionary v0.6 (program_record, criterion_record). DRAFT for Zaineb's review, not final.
+# Source of every value: Programs / Documents / Process_Dates sheets of ELIGO_Scheme_Criteria_v2,
+# plus the Tuebingen exemption text pasted by Zaineb on 2026-11-11.
+# Rules: null = not in the sources (nothing invented). "PROPOSED" = my suggestion, needs your decision.
+# `status` is COMPUTED by the app (change 37), so it is not written here.
+# Scheme-level documents stay on the scheme (Documents sheet). Only program-specific items are listed below.
+
+programs:
+
+  - slug: prg-d02                       # PROPOSED: sheet id lowercased
+    name: "Data Science and Artificial Intelligence (M.Sc.)"
+    operator: "DAAD"                    # TO CONFIRM: scheme operator or host?
+    institution: "Universität des Saarlandes (Saarland Informatics Campus)"
+    country: DE
+    opportunity_type: scholarship
+    scheme_slug: daad
+    track: master
+    degree_level_offered: master
+    field_of_study: engineering_technology   # sheet says "Data science / AI"; mapped by me (dictionary: includes data, AI)
+    language_of_instruction: en
+    application_route: direct           # TO CONFIRM: not stated explicitly, DAAD portal per Process_Dates
+    cohort: "Winter semester 2027/28"
+    deadline: null                      # DAAD FUNDING deadline: unconfirmed (reported 30 Oct 2026, no source; see Process_Dates)
+    host_deadline: null                 # host rounds are in deadline_rounds
+    opening_date: null
+    deadline_rounds: [2026-11-15, 2027-05-15]   # early / late round, confirmed 2026-11-10 (change 41)
+    next_expected_deadline: null
+    deadline_basis: confirmed           # for the rounds; funding deadline still open
+    start_date: 2027-10-01              # DAAD funding start = 1 Oct of entry year (Process_Dates, official)
+    source_url: "https://www.uni-saarland.de/studium/angebot/master/data-science.html"
+    date_checked: 2026-11-10
+    declarations:
+      - "Bachelor of at least 180 CP in computer science, informatics or a related field (no credits field in v0.6)"
+      - "No admission restriction; no tuition fees"
+    required_documents:
+      - "Proof of English C1 (a medium-of-instruction letter is not accepted)"
+
+  - slug: prg-d01                       # PROPOSED
+    name: "Machine Learning (M.Sc.)"
+    operator: "DAAD"
+    institution: "Eberhard Karls Universität Tübingen"
+    country: DE
+    opportunity_type: scholarship
+    scheme_slug: daad
+    track: master
+    degree_level_offered: master
+    field_of_study: engineering_technology   # sheet says "AI / machine learning"; mapped by me
+    language_of_instruction: en
+    application_route: direct           # TO CONFIRM
+    cohort: "Winter semester 2027/28"
+    deadline: null                      # DAAD funding deadline unconfirmed
+    host_deadline: 2027-04-30           # applications open Feb 2027; no late applications. VERIFY when 2027 dates are published
+    opening_date: null                  # "Feb 2027" has no exact day in the sheet
+    deadline_rounds: []
+    next_expected_deadline: null
+    deadline_basis: estimated           # VERIFY: sheet status says 2027 dates not published yet
+    start_date: 2027-09-01   # CONVENTION (decision Nov 12), not a source fact: sources only say "Sep 2027". First day of the intake month, same as Eiffel (change 44)
+    source_url: "https://uni-tuebingen.de/en/166353"
+    date_checked: 2026-11-11            # TO CONFIRM: the exemption text you pasted comes from this URL
+    declarations:
+      - "Bachelor with required maths and computer-science content"
+      - "German grade 2.0 or better, computed by the university (German scale unsupported in v0.6)"
+      - "TOEFL 100 (changed from winter 2026/27); accepted equivalents NOT stated in the sources"
+      - "English test exemption possible: university-level English study, courses held in English, or a recent higher-level exam; proof at most 24 months old"
+      - "No late applications"
+    required_documents:
+      - "English proof submitted by the application deadline (or proof of exemption, at most 24 months old)"
+      - "Transcript showing maths and computer-science content"
+
+  - slug: prg-e01                       # PROPOSED
+    name: "M2 Artificial Intelligence (track of the Computer Science master)"
+    operator: "Campus France"           # TO CONFIRM
+    institution: "Université Paris-Saclay"
+    country: FR
+    opportunity_type: scholarship
+    scheme_slug: campus_france_eiffel
+    track: master
+    degree_level_offered: master
+    field_of_study: engineering_technology   # sheet says "AI"; mapped by me
+    language_of_instruction: en         # "English (all mandatory classes)"
+    application_route: via_institution  # Eiffel: student cannot apply directly (Process_Dates, official)
+    cohort: "Sep 2027"
+    deadline: 2027-01-06                # institution submits to Campus France (official). TO CONFIRM this is the funding deadline for ELIGO
+    host_deadline: 2026-11-26           # internal Eiffel deadline (contact programme coordinator). VERIFY 2027 dates
+    opening_date: null
+    deadline_rounds: []
+    next_expected_deadline: null
+    deadline_basis: confirmed           # Process_Dates "official"; Programs sheet still says VERIFY 2027 application dates
+    start_date: 2027-09-01              # Eiffel stay starts 1 Sep - 30 Nov 2027; 1 Sep per dictionary change 44
+    source_url: "https://ai-master.lisn.upsaclay.fr/"
+    date_checked: 2026-11-09
+    declarations:
+      - "Eiffel award would be 12 months for M2 (24 for M1)"
+      - "Only one application per student is supported"
+      - "Polytech engineering degrees are not eligible"
+    required_documents: []              # nothing program-specific in the sources; Eiffel master documents stay on the scheme
+
+  - slug: prg-s01                       # PROPOSED
+    name: "Computer Science MSc - Artificial Intelligence specialization"
+    operator: "Stipendium Hungaricum"   # TO CONFIRM
+    institution: "Eötvös Loránd University (ELTE), Faculty of Informatics"
+    country: HU
+    opportunity_type: scholarship
+    scheme_slug: stipendium_hungaricum
+    track: master
+    degree_level_offered: master
+    field_of_study: engineering_technology
+    language_of_instruction: en
+    application_route: via_sending_partner   # Tunisia nomination by sending partner
+    cohort: "Sep 2027"
+    deadline: 2027-01-15                # ESTIMATED from the 2026/27 round (15 Jan, 14:00 CET); 2027/28 call not published
+    host_deadline: null
+    opening_date: 2026-11-15            # ESTIMATED: call opens mid-November (15 Nov in 2020-2024 news archive)
+    deadline_rounds: []
+    next_expected_deadline: null
+    deadline_basis: estimated           # change 43: wording "expected around ..., check the official page"
+    start_date: 2027-09-01          
+    source_url: "https://www.elte.hu/en/computer-science-msc-course-artificial-intelligence-specialization"
+    date_checked: 2026-11-09
+    declarations:
+      - "Nomination by the Tunisian sending partner (the sending partner deadline may be earlier)"
+      - "Host language level and any entrance exam to confirm"
+    required_documents: []              # nothing program-specific in the sources
+
+  - slug: prg-s07                       # PROPOSED
+    name: "PhD in Computer Science"
+    operator: "Stipendium Hungaricum"   # TO CONFIRM
+    institution: "University of Szeged - Doctoral School of Computer Science"
+    country: HU
+    opportunity_type: scholarship       # CORRECTED: the Programs sheet says "phd", which is not a valid value (scholarship / internship)
+    scheme_slug: stipendium_hungaricum
+    track: phd
+    degree_level_offered: phd
+    field_of_study: engineering_technology
+    language_of_instruction: en
+    application_route: via_sending_partner   # same SH route (Process_Dates); TO CONFIRM for PhD
+    cohort: "Sep 2027"
+    deadline: 2027-01-15                # ESTIMATED, as S01
+    host_deadline: null                 # university lists start September and February, no date
+    opening_date: 2026-11-15            # ESTIMATED
+    deadline_rounds: []
+    next_expected_deadline: null
+    deadline_basis: estimated
+    start_date: 2027-09-01   # CONVENTION (decision Nov 12), not a source fact: sources only say "Sep 2027". First day of the intake month, same as Eiffel (change 44)
+    source_url: "https://apply.stipendiumhungaricum.hu/courses/course/1740"
+    date_checked: 2026-11-09
+    declarations:
+      - "Supervisor, research plan and master degree required (SH PhD rules)"
+    required_documents: []              # research plan, recommendation and supervisor statement are on the SH PhD scheme list
+
+# ---------------------------------------------------------------------------
+# Program-level criteria (scope: program). Scheme-level criteria stay in the engine CSV.
+# ---------------------------------------------------------------------------
+criteria:
+
+  - id: PRG-D02-EN 
+    program_slug: prg-d02
+    scope: program
+    scheme_slug: daad
+    track: master
+    field: "language:en"                # TO CONFIRM with Shaima: bare path for the CEFR level
+    operator: gte
+    value: "C1"
+    strength: hard
+    cycle: daad_2027_28
+    to_verify: false
+    source_note: "Saarland page: English C1, medium-of-instruction letter not accepted"
+
+  - id: PRG-D02-FIELD 
+    program_slug: prg-d02
+    scope: program
+    scheme_slug: daad
+    track: master
+    field: field_of_study
+    operator: eq
+    value: "engineering_technology"
+    strength: as_a_rule                 # "or a related field" is a committee judgement
+    cycle: daad_2027_28
+    to_verify: false
+    source_note: "Saarland page: computer science, informatics or a related field"
+
+  - id: PRG-E01-EN
+    program_slug: prg-e01
+    scope: program
+    scheme_slug: campus_france_eiffel
+    track: master
+    field: "language:en"
+    operator: gte
+    value: "B2"
+    strength: hard
+    cycle: eiffel_2027
+    to_verify: false
+    source_note: "Programme page: English B2 or equivalent"
+
+  - id: PRG-S01-FIELD
+    program_slug: prg-s01
+    scope: program
+    scheme_slug: stipendium_hungaricum
+    track: master
+    field: field_of_study
+    operator: in
+    value: ["engineering_technology", "mathematics_statistics"]
+    strength: as_a_rule                 # "or related" (telecommunication engineering, information systems, maths, statistics)
+    cycle: sh_2026_27                   # same cycle label as the existing SH rows (2027/28 call not published)
+    to_verify: true                     # ELTE entrance requirements to confirm
+    source_note: "ELTE page: BSc in computer science or related"
+
+  # PRG-D01: no program-level criterion yet (TOEFL equivalents and German grade not expressible, see declarations).
+  # PRG-S07: S-P10 (supervisor_status neq none, hard) and S-P11 (eq confirmed, as_a_rule) already exist in the engine CSV.
+  #          Check that their applies_to points to prg-s07; do not duplicate them here.
