@@ -2,6 +2,9 @@ from django.shortcuts import get_object_or_404, render
 
 from .models import Program
 
+from django.contrib.auth.decorators import login_required
+
+from .matching_service import match_program, missing_profile_fields, profile_to_dict
 
 def program_list(request):
     programs = Program.objects.select_related("scheme").order_by("name")
@@ -49,3 +52,35 @@ def program_detail(request, slug):
         "scheme_documents": program.scheme.documents.all(),
     }
     return render(request, "programs/program_detail.html", context)
+
+
+@login_required
+def matches(request):
+    profile = getattr(request.user, "profile", None)
+    if profile is None:
+        return render(request, "programs/matches.html", {"no_profile": True})
+
+    missing = missing_profile_fields(profile)
+    if missing:
+        return render(
+            request,
+            "programs/matches.html",
+            {"incomplete": True, "missing_fields": missing},
+        )
+
+    profile_dict = profile_to_dict(profile)
+    groups = {}
+    for program in Program.objects.select_related("scheme").order_by("name"):
+        result = match_program(profile_dict, program)
+        cycle = program.status
+        show_cycle_message = result["status"] in ("eligible", "partially_eligible")
+        groups.setdefault(program.scheme, []).append(
+            {
+                "program": program,
+                "result": result,
+                "cycle": cycle,
+                "show_cycle_message": show_cycle_message,
+            }
+        )
+
+    return render(request, "programs/matches.html", {"groups": groups})
