@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Programs · ELIGO{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">Programs</h1>
+
+<form method="get" class="row g-2 mb-4">
+  <div class="col-md-3">
+    <select name="country" class="form-select">
+      <option value="">All countries</option>
+      {% for c in countries %}
+        <option value="{{ c }}" {% if c == selected.country %}selected{% endif %}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select name="opportunity_type" class="form-select">
+      <option value="">All opportunity types</option>
+      {% for t in opportunity_types %}
+        <option value="{{ t }}" {% if t == selected.opportunity_type %}selected{% endif %}>{{ t }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select name="track" class="form-select">
+      <option value="">All tracks</option>
+      {% for t in tracks %}
+        <option value="{{ t }}" {% if t == selected.track %}selected{% endif %}>{{ t }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <button type="submit" class="btn btn-primary">Filter</button>
+    <a href="{% url 'programs:list' %}" class="btn btn-outline-secondary">Reset</a>
+  </div>
+</form>
+
+{% if programs %}
+  <div class="row g-3">
+    {% for program in programs %}
+      <div class="col-md-6">
+        <div class="card h-100">
+          <div class="card-body">
+            <h2 class="h5 card-title">
+              <a href="{% url 'programs:detail' program.slug %}" class="text-decoration-none">{{ program.name }}</a>
+            </h2>
+            <p class="text-muted mb-2">{{ program.institution }} &middot; {{ program.country }}</p>
+            <p class="mb-2">
+              <span class="badge text-bg-secondary">{{ program.scheme.name }}</span>
+              {% if program.track %}<span class="badge text-bg-light border">{{ program.track }}</span>{% endif %}
+            </p>
+            <p class="mb-0 small">
+              Cycle:
+              {% if program.status == "open" %}<span class="badge text-bg-success">Open</span>
+              {% elif program.status == "closed" %}<span class="badge text-bg-danger">Closed</span>
+              {% elif program.status == "not_open_yet" %}<span class="badge text-bg-info">Not open yet</span>
+              {% else %}<span class="badge text-bg-warning">Deadline unknown</span>{% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="text-muted">No programs found.</p>
+{% endif %}
+{% endblock %}
