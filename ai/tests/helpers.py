@@ -1,6 +1,6 @@
 from datetime import date
 from pathlib import Path
-CSV_PATH = Path(__file__).resolve().parents[1] / "data" / "ELIGO_criteria_engine_export (1).csv"
+CSV_PATH = Path(__file__).resolve().parents[1] / "data" / "ELIGO_criteria_engine_export.csv"
 COMPLETE_PROFILE = {
     "date_of_birth": date(2000, 1, 1), "current_level": "engineering_cycle", "highest_degree": "bachelor",
     "first_degree_date": date(2022, 7, 1), "highest_degree_date": date(2022, 7, 1), "expected_graduation": date(2027, 6, 30),

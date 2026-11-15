@@ -24,7 +24,6 @@ class BootstrapMixin:
 def date_widget():
     return forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")
 
-
 def shift_years(years):
     """Today shifted by a number of years (negative = in the past)."""
     today = date.today()
@@ -32,8 +31,6 @@ def shift_years(years):
         return today.replace(year=today.year + years)
     except ValueError:  # 29 February
         return today.replace(year=today.year + years, day=28)
-
-
 class CommaSeparatedListField(forms.CharField):
     """Free text list (e.g. interests): 'AI, robotics' is stored as ['AI', 'robotics']."""
 
@@ -47,26 +44,14 @@ class CommaSeparatedListField(forms.CharField):
 
 class ProfileForm(BootstrapMixin, forms.ModelForm):
     REQUIRED = (
-        "date_of_birth", "nationalities", "country_of_residence", "current_level", "enrollment_mode",
+        "date_of_birth", "country_of_residence", "current_level", "enrollment_mode",
         "institution_type", "institution_country", "field_of_study", "highest_degree",
         "target_degree_level",
     )
 
-    nationalities = forms.MultipleChoiceField(
-        choices=c.NATIONALITY, widget=forms.CheckboxSelectMultiple, required=True,
-        help_text="All nationalities you hold (needed for programs that exclude dual nationals).",
-    )
-    hungarian_status_flags = forms.MultipleChoiceField(
-        choices=c.HUNGARIAN_STATUS_FLAGS, widget=forms.CheckboxSelectMultiple, required=False,
-        help_text="Only if one of these applies to you in Hungary.",
-    )
     previous_awards = forms.MultipleChoiceField(
         choices=c.PREVIOUS_AWARDS, widget=forms.CheckboxSelectMultiple, required=False,
         help_text="Awards you already received or currently hold.",
-    )
-    rejected_applications = forms.MultipleChoiceField(
-        choices=c.REJECTED_APPLICATIONS, widget=forms.CheckboxSelectMultiple, required=False,
-        help_text="Selections you already lost (some programs do not accept a candidate rejected before).",
     )
     target_countries = forms.MultipleChoiceField(
         choices=c.TARGET_COUNTRY, widget=forms.CheckboxSelectMultiple, required=False,
@@ -75,19 +60,29 @@ class ProfileForm(BootstrapMixin, forms.ModelForm):
         choices=c.OPPORTUNITY_TYPE, widget=forms.CheckboxSelectMultiple, required=False,
     )
     interests = CommaSeparatedListField(required=False, help_text="Separate with commas.")
-
+    nationalities = forms.MultipleChoiceField(
+        choices=c.NATIONALITY, widget=forms.CheckboxSelectMultiple, required=True,
+        help_text="All nationalities you hold. Tick every one (some programs exclude French or Hungarian dual nationals).",
+    )
+    hungarian_status_flags = forms.MultipleChoiceField(
+        choices=c.HUNGARIAN_STATUS, widget=forms.CheckboxSelectMultiple, required=False,
+        help_text="Special status in Hungary. Tick nothing if none applies.",
+    )
+    rejected_applications = forms.MultipleChoiceField(
+        choices=c.REJECTED_APPLICATIONS, widget=forms.CheckboxSelectMultiple, required=False,
+        help_text="Selections you already lost (Eiffel does not accept a candidate rejected before). Tick nothing if none.",
+    )
     class Meta:
         model = Profile
         fields = [
             "date_of_birth", "nationalities", "country_of_residence",
             "months_resident_in_germany", "master_started_in_germany", "hungarian_status_flags",
-            "current_level", "year_of_study", "post_bac_years_completed", "expected_graduation",
-            "enrollment_mode", "institution_type", "institution_country", "class_rank_percentile",
+            "current_level", "year_of_study", "post_bac_years_completed", "expected_graduation", "enrollment_mode",
+            "institution_type", "institution_country", "class_rank_percentile",
             "field_of_study", "subfield", "specialization",
             "highest_degree", "first_degree_date", "highest_degree_date", "phd_start_date",
             "gpa_value", "gpa_scale",
-            "work_experience_months", "work_experience_hours_post_degree",
-            "previous_awards", "rejected_applications",
+            "work_experience_months", "work_experience_hours_post_degree", "previous_awards", "rejected_applications",
             "work_study_contract", "supervisor_status", "joint_supervision_agreement", "pfe_agreement",
             "target_degree_level", "target_countries", "target_opportunity_types", "interests",
             "consent_ai_processing",
@@ -103,14 +98,14 @@ class ProfileForm(BootstrapMixin, forms.ModelForm):
             "consent_ai_processing": "I agree that my profile data is processed by AI features (letter, CV, assistant)",
             "first_degree_date": "Date of your first degree",
             "highest_degree_date": "Date of your highest degree",
-            "phd_start_date": "PhD start date",
             "months_resident_in_germany": "Months lived in Germany",
-            "master_started_in_germany": "I already started a master's degree at a German university",
+            "master_started_in_germany": "Master already started in Germany?",
             "post_bac_years_completed": "Years of study after the baccalaureate",
-            "work_study_contract": "I am currently under an apprenticeship or work-study contract",
+            "phd_start_date": "Start date of your PhD",
+            "work_study_contract": "Under an apprenticeship / work-study contract?",
             "supervisor_status": "Doctoral supervisor",
-            "joint_supervision_agreement": "I have a signed (or in-progress) joint supervision agreement",
-            "pfe_agreement": "I have a signed agreement to do my end-of-studies project during the internship",
+            "joint_supervision_agreement": "Joint supervision (cotutelle) agreement?",
+            "pfe_agreement": "Signed end-of-studies project agreement?",
         }
         help_texts = {
             "class_rank_percentile": "Self-declared: 20 means top 20% of your class (between 0.01 and 100). Unverified.",
@@ -120,37 +115,28 @@ class ProfileForm(BootstrapMixin, forms.ModelForm):
             "expected_graduation": "Only if you are currently enrolled.",
             "first_degree_date": "When you completed your first university degree (e.g. your licence). Leave empty if none yet.",
             "highest_degree_date": "When you completed your highest degree. Same date as above if it is your only degree.",
-            "phd_start_date": "Only if you are currently enrolled in a PhD.",
-            "months_resident_in_germany": "Months lived in Germany so far. 0 if never.",
-            "post_bac_years_completed": "Count all years after the baccalaureate, including preparatory years.",
-            "supervisor_status": "Only for doctoral applicants.",
+            "months_resident_in_germany": "Months lived in Germany today. Enter 0 if never.",
+            "master_started_in_germany": "A master's degree already started at a German university. Leave Unknown if unsure.",
+            "post_bac_years_completed": "Years of study already completed after the baccalaureate, counting preparatory years (0 to 10).",
+            "phd_start_date": "Only if you are currently enrolled in a PhD: the date it started.",
+            "work_study_contract": "Currently under an apprenticeship or work-study contract. Leave Unknown if unsure.",
+            "supervisor_status": "Doctoral applicants only. Confirmed = written confirmation or acceptance statement obtained.",
+            "joint_supervision_agreement": "Cotutelle agreement or co-supervision certificate signed or in progress.",
+            "pfe_agreement": "Signed agreement with the supervisor to carry out your end-of-studies project during the internship (Mitacs Globalink).",
         }
 
     sections = [
-        ("Identity", [
-            "date_of_birth", "nationalities", "country_of_residence",
-            "months_resident_in_germany", "master_started_in_germany", "hungarian_status_flags",
-        ]),
+        ("Identity", ["date_of_birth", "nationalities", "country_of_residence"]),
+        ("Germany and Hungary", ["months_resident_in_germany", "master_started_in_germany", "hungarian_status_flags"]),
         ("Current studies", [
-            "current_level", "year_of_study", "post_bac_years_completed", "expected_graduation",
-            "enrollment_mode", "institution_type", "institution_country", "class_rank_percentile",
+            "current_level", "year_of_study", "post_bac_years_completed", "expected_graduation", "enrollment_mode",
+            "institution_type", "institution_country", "class_rank_percentile",
             "field_of_study", "subfield", "specialization",
         ]),
-        ("Degrees and marks", [
-            "highest_degree", "first_degree_date", "highest_degree_date", "phd_start_date",
-            "gpa_value", "gpa_scale",
-        ]),
-        ("Experience and awards", [
-            "work_experience_months", "work_experience_hours_post_degree",
-            "previous_awards", "rejected_applications",
-        ]),
-        ("Application readiness", [
-            "work_study_contract", "supervisor_status", "joint_supervision_agreement", "pfe_agreement",
-        ]),
-        ("Goals", [
-            "target_degree_level", "target_countries", "target_opportunity_types", "interests",
-            "consent_ai_processing",
-        ]),
+        ("Degrees and marks", ["highest_degree", "first_degree_date", "highest_degree_date", "phd_start_date", "gpa_value", "gpa_scale"]),
+        ("Experience and awards", ["work_experience_months", "work_experience_hours_post_degree", "previous_awards", "rejected_applications"]),
+        ("Application readiness", ["work_study_contract", "supervisor_status", "joint_supervision_agreement", "pfe_agreement"]),
+        ("Goals", ["target_degree_level", "target_countries", "target_opportunity_types", "interests", "consent_ai_processing"]),
     ]
 
     def __init__(self, *args, **kwargs):
@@ -174,8 +160,8 @@ class ProfileForm(BootstrapMixin, forms.ModelForm):
 
         # Date of birth: realistic age
         birth = data.get("date_of_birth")
-        if birth and birth > shift_years(-15):
-            self.add_error("date_of_birth", "You must be at least 15 years old.")
+        if birth and birth > shift_years(-18):
+            self.add_error("date_of_birth", "You must be at least 18 years old.")
         elif birth and birth < shift_years(-70):
             self.add_error("date_of_birth", "Please check your date of birth.")
 
@@ -194,17 +180,16 @@ class ProfileForm(BootstrapMixin, forms.ModelForm):
         if first and highest and highest < first:
             self.add_error("highest_degree_date", "The highest degree cannot be dated before the first degree.")
 
-        # PhD start date: only meaningful when currently enrolled in a PhD, and not in the future
-        phd_start = data.get("phd_start_date")
-        if phd_start:
-            if phd_start > today:
-                self.add_error("phd_start_date", "The PhD start date cannot be in the future.")
-            elif data.get("current_level") != "phd":
-                self.add_error("phd_start_date", "Fill this only if you are currently enrolled in a PhD.")
-
         # Same date when the first degree is the highest one
         if data.get("highest_degree") == "bachelor" and data.get("first_degree_date") and not data.get("highest_degree_date"):
             data["highest_degree_date"] = data["first_degree_date"]
+        # PhD start date: only for a student enrolled in a PhD, and not in the future
+        phd_start = data.get("phd_start_date")
+        if phd_start:
+            if data.get("current_level") != "phd":
+                self.add_error("phd_start_date", "Fill this only if you are currently enrolled in a PhD.")
+            elif phd_start > today:
+                self.add_error("phd_start_date", "The start date of your PhD cannot be in the future.")
         return data
 
 
@@ -219,13 +204,11 @@ class LanguageSkillForm(BootstrapMixin, forms.ModelForm):
         model = LanguageSkill
         fields = ["language", "cefr_level", "certificate_type", "certificate_score", "certificate_date"]
         widgets = {"certificate_date": date_widget()}
-
     def clean_certificate_date(self):
         value = self.cleaned_data.get("certificate_date")
         if value and value > date.today():
             raise forms.ValidationError("The certificate date cannot be in the future.")
         return value
-
 
 EducationFormSet = inlineformset_factory(Profile, Education, form=EducationForm, extra=0, can_delete=True)
 LanguageFormSet = inlineformset_factory(Profile, LanguageSkill, form=LanguageSkillForm, extra=0, can_delete=True)

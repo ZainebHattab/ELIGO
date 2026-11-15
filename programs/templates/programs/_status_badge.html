@@ -1,0 +1,3 @@
+{% with s=program.status %}
+  <span class="badge {% if s == 'open' %}text-bg-success{% elif s == 'upcoming' %}text-bg-info{% elif s == 'closed' %}text-bg-secondary{% else %}text-bg-light border{% endif %}">{{ s|capfirst }}</span>
+{% endwith %}

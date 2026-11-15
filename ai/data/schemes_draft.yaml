@@ -1,0 +1,37 @@
+# DRAFT. Values come only from the CSV "source" and "note" columns. Fill the two FILL urls.
+schemes:
+  - slug: daad
+    name: "DAAD study scholarships"
+    operator: "DAAD"                      # TO CONFIRM
+    type: scholarship
+    tracks: [master]
+    source_url: "https://www.daad.tn/en/find-funding/scholarship-database/"   # database root (D-M05: attach entry URL)
+    date_checked: 2026-11-10
+  - slug: campus_france_eiffel
+    name: "Campus France Eiffel"
+    operator: "Campus France"             # TO CONFIRM
+    type: scholarship
+    tracks: [master, phd]
+    source_url: "https://www.campusfrance.org/en/france-excellence-eiffel-scholarship-program"                    # official guide URL (CSV only names the PDF file)
+    date_checked: 2026-11-10
+  - slug: stipendium_hungaricum
+    name: "Stipendium Hungaricum"
+    operator: "Stipendium Hungaricum"     # TO CONFIRM
+    type: scholarship
+    tracks: [master, phd]
+    source_url: "https://stipendiumhungaricum.hu/partners/?partner=tunisia"
+    date_checked: 2026-11-10
+  - slug: mitacs_gri
+    name: "Mitacs Globalink Research Internship"
+    operator: "Mitacs"                    # TO CONFIRM
+    type: internship
+    tracks: [internship]
+    source_url: "https://www.mitacs.ca/our-programs/globalink-research-internship-students/"
+    date_checked: 2026-11-10
+  - slug: iaeste_tunisia
+    name: "IAESTE Tunisia"
+    operator: "IAESTE"                    # TO CONFIRM
+    type: internship
+    tracks: [internship]
+    source_url: "https://www.iaeste.tn/tunisia/"                    # IAESTE Tunisia member page
+    date_checked: 2026-10-25
