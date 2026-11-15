@@ -1,8 +1,486 @@
-:root { --eligo-primary: #1f4e8c; }
-.navbar-brand { font-weight: 700; letter-spacing: .5px; }
-.navbar .nav-link.active { font-weight: 600; }
-main { min-height: 70vh; }
-footer { font-size: .9rem; }
-.htmx-indicator { display: none; }
-.htmx-request .htmx-indicator, .htmx-request.htmx-indicator { display: inline-block; }
-.errorlist { list-style: none; padding: 0; margin: .25rem 0 0; color: #dc3545; font-size: .875rem; }
+/* ============================================================
+   ELIGO — Design system
+   Academic, trustworthy, professional. Primary blue: #1f4e8c
+   ============================================================ */
+
+:root {
+  /* Primary */
+  --eligo-primary: #1f4e8c;
+  --eligo-primary-600: #1a4177;
+  --eligo-primary-700: #163562;
+  --eligo-primary-50: #eef3fa;
+  --eligo-primary-100: #dde8f4;
+
+  /* Status — eligibility */
+  --eligo-eligible: #1d8a57;
+  --eligo-eligible-bg: #e5f5ec;
+  --eligo-eligible-border: #b7e0c9;
+
+  --eligo-partial: #c2790b;
+  --eligo-partial-bg: #fdf3e0;
+  --eligo-partial-border: #f0d9a8;
+
+  --eligo-not: #7a8290;
+  --eligo-not-bg: #eef0f3;
+  --eligo-not-border: #d4d9e0;
+
+  /* Cycle status */
+  --eligo-open: #1d8a57;
+  --eligo-open-bg: #e5f5ec;
+  --eligo-closed: #b94a4a;
+  --eligo-closed-bg: #fbecec;
+  --eligo-upcoming: #2b7ab9;
+  --eligo-upcoming-bg: #e6f1fa;
+  --eligo-unknown: #c2790b;
+  --eligo-unknown-bg: #fdf3e0;
+
+  /* Text */
+  --eligo-text: #1c2430;
+  --eligo-text-muted: #6b7480;
+  --eligo-text-light: #98a1ad;
+
+  /* Surfaces */
+  --eligo-bg: #f6f8fb;
+  --eligo-surface: #ffffff;
+  --eligo-border: #e3e8ef;
+  --eligo-border-strong: #cdd5e0;
+
+  /* Card */
+  --eligo-card-radius: 10px;
+  --eligo-card-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+  --eligo-card-shadow-hover: 0 4px 12px rgba(16, 24, 40, 0.08);
+
+  /* Spacing scale */
+  --eligo-space-1: 0.25rem;
+  --eligo-space-2: 0.5rem;
+  --eligo-space-3: 0.75rem;
+  --eligo-space-4: 1rem;
+  --eligo-space-5: 1.5rem;
+  --eligo-space-6: 2rem;
+  --eligo-space-7: 3rem;
+}
+
+/* ---------- Base ---------- */
+body {
+  background-color: var(--eligo-bg);
+  color: var(--eligo-text);
+  font-feature-settings: "tnz" 1;
+}
+
+main {
+  min-height: 70vh;
+}
+
+footer {
+  font-size: 0.9rem;
+  background-color: var(--eligo-surface);
+}
+
+/* ---------- Navbar ---------- */
+.navbar {
+  background-color: var(--eligo-surface) !important;
+  border-bottom: 1px solid var(--eligo-border);
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--eligo-primary) !important;
+  font-size: 1.25rem;
+}
+
+.navbar .nav-link {
+  color: var(--eligo-text) !important;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding-left: 0.85rem !important;
+  padding-right: 0.85rem !important;
+}
+
+.navbar .nav-link.active {
+  font-weight: 600;
+  color: var(--eligo-primary) !important;
+}
+
+.navbar .nav-link.disabled {
+  color: var(--eligo-text-light) !important;
+}
+
+.navbar .navbar-text {
+  color: var(--eligo-text-muted);
+  font-size: 0.875rem;
+}
+
+/* ---------- Buttons ---------- */
+.btn-primary {
+  --bs-btn-bg: var(--eligo-primary);
+  --bs-btn-border-color: var(--eligo-primary);
+  --bs-btn-hover-bg: var(--eligo-primary-600);
+  --bs-btn-hover-border-color: var(--eligo-primary-600);
+  --bs-btn-active-bg: var(--eligo-primary-700);
+  --bs-btn-active-border-color: var(--eligo-primary-700);
+  --bs-btn-disabled-bg: var(--eligo-primary);
+  --bs-btn-disabled-border-color: var(--eligo-primary);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--eligo-primary);
+  --bs-btn-border-color: var(--eligo-primary);
+  --bs-btn-hover-bg: var(--eligo-primary);
+  --bs-btn-hover-border-color: var(--eligo-primary);
+  --bs-btn-active-bg: var(--eligo-primary);
+  --bs-btn-active-border-color: var(--eligo-primary);
+}
+
+.btn-outline-secondary {
+  --bs-btn-color: var(--eligo-text-muted);
+  --bs-btn-border-color: var(--eligo-border-strong);
+  --bs-btn-hover-bg: var(--eligo-primary-50);
+  --bs-btn-hover-border-color: var(--eligo-border-strong);
+  --bs-btn-hover-color: var(--eligo-primary);
+  --bs-btn-active-bg: var(--eligo-primary-100);
+}
+
+/* ---------- Cards ---------- */
+.card {
+  background-color: var(--eligo-surface);
+  border: 1px solid var(--eligo-border);
+  border-radius: var(--eligo-card-radius);
+  box-shadow: var(--eligo-card-shadow);
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.card-title {
+  font-weight: 600;
+}
+
+/* ---------- Badges: general ---------- */
+.badge {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  padding: 0.4em 0.65em;
+  border-radius: 6px;
+}
+
+.badge.rounded-pill {
+  padding: 0.4em 0.8em;
+}
+
+/* ---------- Eligibility status badges ---------- */
+.badge-status-eligible {
+  background-color: var(--eligo-eligible-bg);
+  color: var(--eligo-eligible);
+  border: 1px solid var(--eligo-eligible-border);
+}
+
+.badge-status-partial {
+  background-color: var(--eligo-partial-bg);
+  color: var(--eligo-partial);
+  border: 1px solid var(--eligo-partial-border);
+}
+
+.badge-status-not {
+  background-color: var(--eligo-not-bg);
+  color: var(--eligo-not);
+  border: 1px solid var(--eligo-not-border);
+}
+
+/* ---------- Cycle status badges ---------- */
+.badge-cycle-open {
+  background-color: var(--eligo-open-bg);
+  color: var(--eligo-open);
+  border: 1px solid #b7e0c9;
+}
+
+.badge-cycle-closed {
+  background-color: var(--eligo-closed-bg);
+  color: var(--eligo-closed);
+  border: 1px solid #ebcccb;
+}
+
+.badge-cycle-upcoming {
+  background-color: var(--eligo-upcoming-bg);
+  color: var(--eligo-upcoming);
+  border: 1px solid #c3dff2;
+}
+
+.badge-cycle-unknown {
+  background-color: var(--eligo-unknown-bg);
+  color: var(--eligo-unknown);
+  border: 1px solid #f0d9a8;
+}
+
+/* ---------- Source / meta badges ---------- */
+.badge-meta {
+  background-color: var(--eligo-bg);
+  color: var(--eligo-text-muted);
+  border: 1px solid var(--eligo-border);
+  font-weight: 500;
+}
+
+/* ---------- Match cards ---------- */
+.match-card {
+  border-left: 4px solid var(--eligo-border);
+  transition: box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.match-card.match-eligible {
+  border-left-color: var(--eligo-eligible);
+}
+
+.match-card.match-partial {
+  border-left-color: var(--eligo-partial);
+}
+
+.match-card.match-not {
+  border-left-color: var(--eligo-not);
+}
+
+.match-card:hover {
+  box-shadow: var(--eligo-card-shadow-hover);
+}
+
+.match-score {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--eligo-text-muted);
+}
+
+.match-reasons,
+.match-missing {
+  background-color: var(--eligo-bg);
+  border: 1px solid var(--eligo-border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-top: 0.5rem;
+}
+
+.match-reasons ul,
+.match-missing ul {
+  margin-bottom: 0;
+  padding-left: 1.1rem;
+}
+
+.match-reasons .match-section-label {
+  color: var(--eligo-eligible);
+}
+
+.match-missing .match-section-label {
+  color: var(--eligo-partial);
+}
+
+.match-section-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 0.35rem;
+}
+
+/* ---------- Program cards (list) ---------- */
+.program-card {
+  transition: box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.program-card:hover {
+  box-shadow: var(--eligo-card-shadow-hover);
+  border-color: var(--eligo-border-strong);
+}
+
+.program-card .card-title a {
+  color: var(--eligo-text);
+  transition: color 0.15s ease;
+}
+
+.program-card .card-title a:hover {
+  color: var(--eligo-primary);
+}
+
+/* ---------- Filter bar ---------- */
+.filter-bar {
+  background-color: var(--eligo-surface);
+  border: 1px solid var(--eligo-border);
+  border-radius: var(--eligo-card-radius);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--eligo-card-shadow);
+}
+
+.filter-bar .form-select {
+  border-color: var(--eligo-border-strong);
+}
+
+.filter-bar .form-select:focus {
+  border-color: var(--eligo-primary);
+  box-shadow: 0 0 0 0.2rem rgba(31, 78, 140, 0.12);
+}
+
+/* ---------- Detail page ---------- */
+.detail-section {
+  background-color: var(--eligo-surface);
+  border: 1px solid var(--eligo-border);
+  border-radius: var(--eligo-card-radius);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--eligo-card-shadow);
+}
+
+.detail-section h2 {
+  color: var(--eligo-primary);
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--eligo-primary-50);
+  margin-bottom: 1rem;
+}
+
+.detail-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.detail-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--eligo-border);
+  font-size: 0.95rem;
+}
+
+.detail-list li:last-child {
+  border-bottom: none;
+}
+
+.detail-list li strong {
+  display: inline-block;
+  min-width: 9rem;
+  color: var(--eligo-text-muted);
+  font-weight: 600;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  padding: 4rem 1rem 3.5rem;
+}
+
+.hero h1 {
+  color: var(--eligo-text);
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+}
+
+.hero .lead {
+  color: var(--eligo-text-muted);
+  line-height: 1.6;
+}
+
+.hero-divider {
+  width: 56px;
+  height: 4px;
+  background: var(--eligo-primary);
+  border-radius: 2px;
+  margin: 0 auto 1.5rem;
+}
+
+/* ---------- Alerts ---------- */
+.alert {
+  border-radius: var(--eligo-card-radius);
+}
+
+.alert-info {
+  background-color: var(--eligo-primary-50);
+  border-color: var(--eligo-primary-100);
+  color: var(--eligo-primary-700);
+}
+
+.alert-warning {
+  background-color: var(--eligo-partial-bg);
+  border-color: var(--eligo-partial-border);
+  color: var(--eligo-partial);
+}
+
+/* ---------- Scheme group heading ---------- */
+.scheme-group-heading {
+  color: var(--eligo-text);
+  font-weight: 700;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--eligo-primary-50);
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+/* ---------- Typography helpers ---------- */
+.text-muted {
+  color: var(--eligo-text-muted) !important;
+}
+
+.text-eligo-primary {
+  color: var(--eligo-primary) !important;
+}
+
+.small-muted {
+  font-size: 0.85rem;
+  color: var(--eligo-text-muted);
+}
+
+/* ---------- HTMX ---------- */
+.htmx-indicator {
+  display: none;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+  display: inline-block;
+}
+
+/* ---------- Forms ---------- */
+.errorlist {
+  list-style: none;
+  padding: 0;
+  margin: 0.25rem 0 0;
+  color: var(--eligo-closed);
+  font-size: 0.875rem;
+}
+
+.form-select,
+.form-control {
+  border-color: var(--eligo-border-strong);
+}
+
+.form-select:focus,
+.form-control:focus {
+  border-color: var(--eligo-primary);
+  box-shadow: 0 0 0 0.2rem rgba(31, 78, 140, 0.12);
+}
+
+/* ---------- Back link ---------- */
+.back-link {
+  color: var(--eligo-text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.back-link:hover {
+  color: var(--eligo-primary);
+}
+
+/* ---------- Source line ---------- */
+.source-line {
+  font-size: 0.85rem;
+  color: var(--eligo-text-light);
+  border-top: 1px solid var(--eligo-border);
+  padding-top: 1rem;
+  margin-top: 1.5rem;
+}
+
+.source-line a {
+  color: var(--eligo-primary);
+  text-decoration: none;
+}
+
+.source-line a:hover {
+  text-decoration: underline;
+}
