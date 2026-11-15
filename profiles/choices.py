@@ -9,9 +9,15 @@ CURRENT_LEVEL = [("none", "Not currently enrolled")] + DEGREE_LEVEL
 
 CEFR = [("A1", "A1"), ("A2", "A2"), ("B1", "B1"), ("B2", "B2"), ("C1", "C1"), ("C2", "C2"), ("native", "Native")]
 
-NATIONALITY = [("TN", "Tunisia")]
-COUNTRY = [("TN", "Tunisia"), ("FR", "France"), ("DE", "Germany"), ("CA", "Canada"), ("IT", "Italy"), ("other", "Other")]
-TARGET_COUNTRY = [("CA", "Canada"), ("DE", "Germany"), ("FR", "France"), ("GB", "United Kingdom"), ("IT", "Italy"), ("other", "Other")]
+NATIONALITY = [("TN", "Tunisia"), ("FR", "France"), ("HU", "Hungary"), ("other", "Other")]
+COUNTRY = [
+    ("TN", "Tunisia"), ("FR", "France"), ("DE", "Germany"), ("HU", "Hungary"),
+    ("CA", "Canada"), ("IT", "Italy"), ("other", "Other"),
+]
+TARGET_COUNTRY = [
+    ("DE", "Germany"), ("FR", "France"), ("HU", "Hungary"),
+    ("CA", "Canada"), ("IT", "Italy"), ("other", "Other"),
+]
 
 ENROLLMENT_MODE = [("full_time", "Full time"), ("part_time", "Part time")]
 INSTITUTION_TYPE = [("public", "Public"), ("private", "Private")]
@@ -23,7 +29,9 @@ FIELD_OF_STUDY = [
     ("business_economics", "Business and economics"),
     ("health_medicine", "Health and medicine"),
     ("law_social_sciences", "Law and social sciences"),
-    ("humanities_arts", "Humanities and arts"),
+    ("humanities", "Humanities"),
+    ("arts_music_performing", "Arts, music and performing arts"),
+    ("architecture_design", "Architecture and design"),
     ("other", "Other"),
 ]
 SUBFIELD = [
@@ -46,9 +54,27 @@ PREVIOUS_AWARDS = [
     ("chevening", "Chevening"),
     ("other_uk_government_scholarship", "Other UK government scholarship"),
     ("french_government_scholarship", "French government scholarship"),
+    ("eiffel_phd", "Eiffel (PhD)"),
+    ("daad_doctoral", "DAAD doctoral scholarship"),
+    ("zuse_school_scholarship", "Zuse School scholarship"),
+    ("stipendium_hungaricum_bachelor", "Stipendium Hungaricum (bachelor)"),
+    ("stipendium_hungaricum_master", "Stipendium Hungaricum (master)"),
+    ("stipendium_hungaricum_phd", "Stipendium Hungaricum (PhD)"),
+    ("hungarian_government_scholarship", "Other Hungarian government scholarship"),
+]
+REJECTED_APPLICATIONS = [("eiffel_master", "Eiffel (master)"), ("eiffel_phd", "Eiffel (PhD)")]
+HUNGARIAN_STATUS_FLAGS = [
+    ("stateless", "Stateless"),
+    ("refugee", "Refugee"),
+    ("long_term_resident", "Long-term resident in Hungary"),
+]
+SUPERVISOR_STATUS = [
+    ("none", "No supervisor yet"),
+    ("contacted", "Supervisor contacted"),
+    ("confirmed", "Supervisor confirmed in writing"),
 ]
 
-TARGET_DEGREE_LEVEL = [("master", "Master"), ("phd", "PhD"), ("research_internship", "Research internship")]
+TARGET_DEGREE_LEVEL = [("master", "Master"), ("phd", "PhD"), ("internship", "Internship")]
 OPPORTUNITY_TYPE = [("scholarship", "Scholarship"), ("internship", "Internship"), ("fellowship", "Fellowship")]
 
 LANGUAGE = [("ar", "Arabic"), ("fr", "French"), ("en", "English"), ("de", "German"), ("es", "Spanish"), ("it", "Italian"), ("other", "Other")]

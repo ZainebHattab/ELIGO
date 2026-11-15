@@ -9,8 +9,7 @@ REQUIRED_PROFILE_FIELDS = (
     "date_of_birth",
     "current_level",
     "field_of_study",
-    "gpa_value",
-    "gpa_scale",
+    "highest_degree",
     "target_degree_level",
 )
 
@@ -33,8 +32,12 @@ def profile_to_dict(profile):
             value = float(value)
         data[field.name] = value
 
-    # v0.6 expects a list of nationalities. Temporary until Profile is updated.
-    data["nationalities"] = [profile.nationality] if profile.nationality else []
+    # gpa_scale is stored as text ("20", "4.0", "100"); the dictionary wants a number
+    if profile.gpa_scale:
+        data["gpa_scale"] = float(profile.gpa_scale)
+
+    # Computed field read by the engine (matching: true)
+    data["gpa_percent"] = profile.gpa_percent
 
     data["languages"] = [
         {
