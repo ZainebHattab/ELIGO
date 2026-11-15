@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}My matches - ELIGO{% endblock %}
+{% block content %}
+<h1 class="h3 mb-3">My matches</h1>
+
+{% if incomplete %}
+  <div class="alert alert-warning">
+    <p class="mb-2">Complete your profile to see your matches. Still missing:</p>
+    <ul class="mb-3">{% for label in missing_labels %}<li>{{ label }}</li>{% endfor %}</ul>
+    <a class="btn btn-primary btn-sm" href="{% url 'profile_edit' %}">Complete my profile</a>
+  </div>
+{% else %}
+  {% for scheme, items in groups %}
+    <h2 class="h5 mt-4">{{ scheme.name }}</h2>
+    {% for m in items %}
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <a class="h6 text-decoration-none" href="{% url 'program_detail' m.program.slug %}">{{ m.program.name }}</a>
+              <div class="text-muted small">{{ m.program.institution }}</div>
+            </div>
+            <div class="text-end">
+              {% if m.result.status == "eligible" %}<span class="badge bg-success">Eligible</span>
+              {% elif m.result.status == "partially_eligible" %}<span class="badge bg-warning text-dark">Partially eligible</span>
+              {% else %}<span class="badge bg-secondary">Not eligible</span>{% endif %}
+              <div class="small text-muted mt-1">Score {{ m.result.score }}/100</div>
+            </div>
+          </div>
+
+          {% if m.show_cycle_notice %}
+            <div class="alert alert-info py-2 small mt-3 mb-0">{{ m.cycle_message }}</div>
+          {% endif %}
+
+          {% if m.result.reasons %}
+            <h3 class="h6 mt-3">Why</h3>
+            <ul class="small mb-2">
+              {% for r in m.result.reasons %}<li><span class="badge text-bg-light">{{ r.source|title }}</span> {{ r.text }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+          {% if m.result.missing %}
+            <h3 class="h6 mt-3">Missing information</h3>
+            <ul class="small mb-0">
+              {% for item in m.result.missing %}<li><span class="badge text-bg-light">{{ item.source|title }}</span> {{ item.text }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  {% empty %}
+    <p class="text-muted">No programs in the catalogue yet.</p>
+  {% endfor %}
+{% endif %}
+{% endblock %}

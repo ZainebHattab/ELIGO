@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{{ program.name }} - ELIGO{% endblock %}
+{% block content %}
+<div class="col-lg-8 mx-auto">
+  <a href="{% url 'program_list' %}" class="small">&larr; All programs</a>
+  <div class="d-flex justify-content-between align-items-start mt-2">
+    <h1 class="h3">{{ program.name }}</h1>
+    {% include "programs/_status_badge.html" %}
+  </div>
+  <p class="text-muted">{{ program.institution }} &middot; {{ program.get_country_display }} &middot; {{ program.scheme.name }}</p>
+  <div class="alert alert-light border">{{ message }}</div>
+  {% if user.is_authenticated %}
+  <p class="small text-muted">Matching will show here whether you are eligible.</p>
+  {% else %}
+  <div class="alert alert-primary">
+    Want to know if you are eligible?
+    <a href="{% url 'register' %}" class="alert-link">Create a free account</a>
+    or <a href="{% url 'login' %}?next={{ request.path }}" class="alert-link">log in</a>.
+  </div>
+ {% endif %}
+  <dl class="row">
+    <dt class="col-sm-4">Level</dt><dd class="col-sm-8">{{ program.get_track_display }}</dd>
+    <dt class="col-sm-4">Intake</dt><dd class="col-sm-8">{{ program.cohort|default:"-" }}</dd>
+    <dt class="col-sm-4">Language</dt><dd class="col-sm-8">{{ program.get_language_of_instruction_display|default:"-" }}</dd>
+    <dt class="col-sm-4">How to apply</dt><dd class="col-sm-8">{{ program.get_application_route_display|default:"-" }}</dd>
+  </dl>
+
+  {% if program.declarations %}
+    <h2 class="h5">Good to know</h2>
+    <ul>{% for item in program.declarations %}<li>{{ item }}</li>{% endfor %}</ul>
+  {% endif %}
+
+  <h2 class="h5">Documents</h2>
+  {% if documents %}
+    <ul>{% for doc in documents %}<li>{{ doc.name }}{% if doc.note %} <span class="text-muted">({{ doc.note }})</span>{% endif %}</li>{% endfor %}</ul>
+  {% else %}
+    <p class="text-muted">No documents listed yet. See the official page.</p>
+  {% endif %}
+
+  <p class="small text-muted">
+    Source: <a href="{{ program.source_url }}" target="_blank" rel="noopener">{{ program.source_url }}</a>
+    &middot; checked on {{ program.date_checked }}
+  </p>
+</div>
+{% endblock %}

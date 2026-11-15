@@ -6,6 +6,7 @@ import pytest
 from ai.matching.criterion import Impact, Outcome, evaluate_criterion, impact_of
 from ai.matching.criteria_io import load_criteria_csv
 from ai.tests.helpers import COMPLETE_PROFILE, CSV_PATH
+from ai.tests.helpers import CSV_PATH
 
 PROGRAM = {"deadline": date(2027, 1, 6), "start_date": date(2027, 9, 1)}
 NO_DEADLINE = {"deadline": None, "start_date": date(2027, 10, 1)}
@@ -80,7 +81,6 @@ def test_bad_criteria_raise():
 
 
 # ---------- guard on the real 62 criteria ----------
-CSV_PATH = Path(__file__).parent / "data" / "ELIGO_criteria_engine_export_1.csv"
 
 
 

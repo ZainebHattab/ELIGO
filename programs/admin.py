@@ -1,85 +1,96 @@
 from django.contrib import admin
 
-from .models import (
-    EligibilityCriterion,
-    FundingScheme,
-    Program,
-    RequiredDocument,
-)
+from .models import EligibilityCriterion, FundingScheme, Program, RequiredDocument
 
 
 class SchemeCriterionInline(admin.TabularInline):
-    """Criteria shown under a FundingScheme (scheme-level rules)."""
     model = EligibilityCriterion
-    fk_name = "scheme"
     extra = 0
-    # Program-level criteria are managed from the Program page, so hide them here
-    exclude = ("program",)
-    verbose_name = "scheme criterion"
-    verbose_name_plural = "scheme criteria"
+    exclude = ("scope", "program")
+    verbose_name_plural = "scheme-level criteria"
 
     def get_queryset(self, request):
-        return super().get_queryset(request).filter(scope="scheme")
-
-
-class ProgramCriterionInline(admin.TabularInline):
-    """Criteria shown under a Program (program-level rules)."""
-    model = EligibilityCriterion
-    fk_name = "program"
-    extra = 0
-    verbose_name = "program criterion"
-    verbose_name_plural = "program criteria"
+        return super().get_queryset(request).filter(program__isnull=True)
 
 
 class SchemeDocumentInline(admin.TabularInline):
     model = RequiredDocument
-    fk_name = "scheme"
     extra = 0
     exclude = ("program",)
+    verbose_name_plural = "scheme-level documents"
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(program__isnull=True)
+
+
+class ProgramCriterionInline(admin.TabularInline):
+    model = EligibilityCriterion
+    extra = 0
+    exclude = ("scope", "scheme", "track")
+    verbose_name_plural = "program-level criteria"
 
 
 class ProgramDocumentInline(admin.TabularInline):
     model = RequiredDocument
-    fk_name = "program"
     extra = 0
     exclude = ("scheme",)
+    verbose_name_plural = "program-level documents"
+
+
+def _save_inlines(formset, defaults: dict) -> None:
+    """Save inline rows, setting the fields hidden from the form."""
+    instances = formset.save(commit=False)
+    for obj in formset.deleted_objects:
+        obj.delete()
+    for obj in instances:
+        for name, value in defaults.items():
+            setattr(obj, name, value)
+        obj.save()
+    formset.save_m2m()
 
 
 @admin.register(FundingScheme)
 class FundingSchemeAdmin(admin.ModelAdmin):
     list_display = ("name", "operator", "type", "date_checked")
-    list_filter = ("type", "operator")
+    list_filter = ("type",)
     search_fields = ("name", "slug", "operator")
     prepopulated_fields = {"slug": ("name",)}
     inlines = [SchemeCriterionInline, SchemeDocumentInline]
 
+    def save_formset(self, request, form, formset, change):
+        scheme = form.instance
+        if formset.model is EligibilityCriterion:
+            _save_inlines(formset, {"scope": "scheme", "program": None})
+        else:
+            _save_inlines(formset, {"program": None})
+
 
 @admin.register(Program)
 class ProgramAdmin(admin.ModelAdmin):
-    list_display = (
-        "name",
-        "institution",
-        "country",
-        "scheme",
-        "track",
-        "deadline",
-        "host_deadline",
-        "deadline_basis",
-    )
-    list_filter = ("country", "opportunity_type", "scheme", "track", "deadline_basis")
+    list_display = ("name", "scheme", "country", "track", "deadline", "cycle")
+    list_filter = ("scheme", "country", "track", "opportunity_type")
     search_fields = ("name", "slug", "institution")
+    list_select_related = ("scheme",)
     prepopulated_fields = {"slug": ("name",)}
+    readonly_fields = ("cycle",)
     inlines = [ProgramCriterionInline, ProgramDocumentInline]
+
+    @admin.display(description="Cycle status")
+    def cycle(self, obj: Program) -> str:
+        return obj.status if obj.pk else "-"
+
+    def save_formset(self, request, form, formset, change):
+        program = form.instance
+        if formset.model is EligibilityCriterion:
+            _save_inlines(formset, {"scope": "program", "scheme": program.scheme, "track": program.track})
+        else:
+            _save_inlines(formset, {"scheme": program.scheme})
 
 
 @admin.register(EligibilityCriterion)
 class EligibilityCriterionAdmin(admin.ModelAdmin):
-    list_display = ("field", "operator", "value", "strength", "scope", "scheme", "program", "to_verify")
-    list_filter = ("scope", "strength", "scheme", "to_verify")
-    search_fields = ("field", "source_note")
-
-
-@admin.register(RequiredDocument)
-class RequiredDocumentAdmin(admin.ModelAdmin):
-    list_display = ("name", "scheme", "program")
-    search_fields = ("name",)
+    """Read-mostly overview of all rules, for checking the loader's work."""
+    list_display = ("code", "scope", "scheme", "track", "program", "field", "operator", "value", "strength", "to_verify")
+    list_filter = ("scope", "scheme", "track", "strength", "to_verify")
+    search_fields = ("code", "field")
+    list_select_related = ("scheme", "program")

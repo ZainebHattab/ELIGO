@@ -1,16 +1,12 @@
 from decimal import Decimal
-
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from . import choices as c
 
-
 def default_nationalities():
-    return ["TN"]
-
-
+         return ["TN"]
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile")
 
@@ -21,7 +17,6 @@ class Profile(models.Model):
     months_resident_in_germany = models.PositiveIntegerField(null=True, blank=True)
     master_started_in_germany = models.BooleanField(null=True, blank=True)
     hungarian_status_flags = models.JSONField(default=list, blank=True)
-
     # Current studies
     current_level = models.CharField(max_length=30, choices=c.CURRENT_LEVEL, null=True, blank=True)
     year_of_study = models.PositiveSmallIntegerField(
@@ -47,7 +42,6 @@ class Profile(models.Model):
     first_degree_date = models.DateField(null=True, blank=True)
     highest_degree_date = models.DateField(null=True, blank=True)
     phd_start_date = models.DateField(null=True, blank=True)
-
     # Marks
     gpa_value = models.DecimalField(
         max_digits=5, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(0)]
@@ -59,13 +53,11 @@ class Profile(models.Model):
     work_experience_hours_post_degree = models.PositiveIntegerField(null=True, blank=True)
     previous_awards = models.JSONField(default=list, blank=True)
     rejected_applications = models.JSONField(default=list, blank=True)
-
-    # Application readiness
+    # Application readiness 
     work_study_contract = models.BooleanField(null=True, blank=True)
     supervisor_status = models.CharField(max_length=20, choices=c.SUPERVISOR_STATUS, null=True, blank=True)
     joint_supervision_agreement = models.BooleanField(null=True, blank=True)
     pfe_agreement = models.BooleanField(null=True, blank=True)
-
     # Target
     target_degree_level = models.CharField(max_length=30, choices=c.TARGET_DEGREE_LEVEL, null=True, blank=True)
 
@@ -76,13 +68,6 @@ class Profile(models.Model):
     consent_ai_processing = models.BooleanField(default=False)
 
     updated_at = models.DateTimeField(auto_now=True)
-
-    @property
-    def gpa_percent(self):
-        """Computed field from the dictionary: gpa_value / gpa_scale * 100."""
-        if self.gpa_value is None or not self.gpa_scale:
-            return None
-        return float(self.gpa_value) / float(self.gpa_scale) * 100
 
     def __str__(self):
         return f"Profile of {self.user.email}"
